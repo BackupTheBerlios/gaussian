@@ -256,6 +256,11 @@ initGaussian()
 		for(int k=0;k<=N;k++) sum+=psi(k,i)*psi(k,j);
 		K(i,j)=sum;
 	}
+  // add SIGMA along the diagonal to make sure
+  // this matrix is positive definite
+  for(int i=0;i<=n;i++) K(i,i)+=SIGMA;
+  
+  // Cholesky root R
 	LTRRealMatrix& rho=K.ltrRoot();
 	R=rho;
 	delete &rho;
@@ -360,8 +365,7 @@ void
 GPR::
 expansionData(int q)
 {
-   assert(q<=N);
-   // write the data
+  assert(q<=N);       
 	ofstream dout("FunctionData.txt");
 	for(int j=0;j<=n;j++) dout << s[j] << "  " << y[j] << endl;
 	dout.close();
@@ -389,6 +393,74 @@ expansionData(int q)
 
 			
 //--------------------------TESTS------------------------------------		
+
+
+Real
+GPR::
+min_R_jj()
+{
+   Real min=10000000.0;
+   for(int j=0;j<=n;j++) if(R(j,j)<min) min=R(j,j);
+   return min;
+}
+
+
+Real
+GPR::
+max_R_jj()
+{
+   Real max=0.0;
+   for(int j=0;j<=n;j++) if(R(j,j)>max) max=R(j,j);
+   return max;
+}
+
+
+
+Real
+GPR::
+conditionNumber_of_R()
+{
+   Real max=max_R_jj(),
+        min=min_R_jj();
+   if(max==0.0) return -1.0;
+   return max/min;
+}
+
+
+void
+GPR::
+conditioning()
+{
+   bool done=false;
+   while(!done){
+     
+      cout << "Condition of the Cholesky root R: " << conditionNumber_of_R() << endl
+           << "R_jj min=" << min_R_jj() << ", R_jj max=" << max_R_jj() << endl
+           << "Improve conditioning (0/1), improve=";
+      int go; cin>>go;
+      if(go==1){
+
+        cout << "We'll add sigma to the diagonal of (K(s_i,s_j)). sigma=";
+        Real sigma; cin>>sigma;
+        diagonal_K_add(sigma);
+      } else { done=true; }
+   } // end while
+}
+
+
+
+
+void
+GPR::
+diagonal_K_add(Real sigma)
+{
+   for(int j=0;j<=n;j++) K(j,j)+=sigma;
+   R=K.ltrRoot();
+   if(have_gaussian) computeGaussianCoefficients();
+}       
+
+        
+      
 
 void
 GPR::

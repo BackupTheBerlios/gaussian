@@ -173,7 +173,17 @@ public:
 
 //------------------TESTS--------------------------------------------
 
+   /** Reports the condition number of the Cholesky root R of the kernel matrix
+    *  \f$D=(K(s_i,s_j))\f$ and asks the user if the conditioning should be improved
+    *  by adding $\sigma>0$ to the diagonal elements of $D$.
+    */
+   void conditioning();
 
+   /** Condition number of the Cholesky root R of the kernel matrix
+    *  \f$(K(s_i,s_j))\f$.
+    */
+   Real conditionNumber_of_R();
+   
    /** Allocates a directory <code>bases</code> and prints a plot of the
     *  first q basis functions for each of the bases which are implemented.
     **/
@@ -209,21 +219,24 @@ private:
    RealFunction f;          // function generating the data (NULL if unknown).
    BasisFunctions* basis;   // the basis functions psi_k
    string basis_name;       // name of basis
-	RealMatrix psi;          // basis functions psi(k,j)=psi_k(s_j), 0<=k<=N, 0<=j<=n.
-	UTRRealMatrix K;         // kernel matrix K(s_i,s_j), 0<=i,j<=n.
-	LTRRealMatrix R;         // lower triangular Cholesky root of K.
+   RealMatrix psi;          // basis functions psi(k,j)=psi_k(s_j), 0<=k<=N, 0<=j<=n.
+   UTRRealMatrix K;         // kernel matrix K(s_i,s_j), 0<=i,j<=n.
+   LTRRealMatrix R;         // lower triangular Cholesky root of K.
    RealArray1D mu;          // center of the Gaussian prior
    RealArray1D a;           // Gaussian coefficients
    RealArray1D empCoeff;    // empirical coefficients
 
-   Real EA(int k);   // coefficient a_k=E(A_k) of psi_k
-   Real EC(int k);   // empirical coefficient of psi_k
-
+   Real EA(int k);                      // coefficient a_k=E(A_k) of psi_k
+   Real EC(int k);                      // empirical coefficient of psi_k
+   Real min_R_jj();
+   Real max_R_jj();
+   void diagonal_K_add(Real sigma);
+   
    void initBasis();                    // matrix of basis function values
    void computeEmpiricalCoefficients(); // write into coefficient array
    void initGaussian();                 // all data for Gaussian regression
    void computeGaussianCoefficients();  // write into coefficient array
-   		
+
 }; // end GPR
 
  
