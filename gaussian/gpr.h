@@ -56,14 +56,14 @@ public:
    const RealMatrix& get_psi() const { return psi; }
 
    /** The vector of empirical coefficients. */
-   const RealArray1D& getEmpiricalCoefficients() const { return empCoeff; }
+   const RealArray1D& getEmpiricalCoefficients() const { return b; }
 
    /** The vector of Gaussian coefficients. */
    const RealArray1D& getGaussianCoefficients() const { return a; }
 
    /** The vector of coefficients used by the current regression. */
    const RealArray1D& getCoefficients() const
-   { if(regrType==EMPIRICAL) return empCoeff; return a; }
+   { if(regrType==EMPIRICAL) return b; return a; }
 
    /** Is the Gaussian machinery enabled?
     */
@@ -114,23 +114,24 @@ public:
     *
     *  @param dmax maximum degree N of expansion.
     *  @param t data abscissas \f$t_j,\ 0<=j<=n\f$.
-	 *  @param w function data \f$w_j=f(t_j),\ 0<=j<=n\f$.
+    *  @param w function data \f$w_j=f(t_j),\ 0<=j<=n\f$.
     *  @param bFcns object containing the basis functions.
+    *  @param sigma standard deviation of noise in the data.
     *  @param rt type of regression (EMPIRICAL, GAUSSIAN),
     *  EMPIRICAL does not initialize the Gaussian data structures.
-	 **/
-	GPR(int dmax, RealArray1D& t, RealArray1D& w, BasisFunctions* bFcns,
-       RegressionType rt=EMPIRICAL);
+    **/
+   GPR(int dmax, RealArray1D& t, RealArray1D& w, BasisFunctions* bFcns,
+       Real sigma=0.2, RegressionType rt=EMPIRICAL);
 
    /** As {@link GPR(int,RealArray1D&,RealArray1D&,BasisFunctions*,RegressionType)}
     *  except that the function generating the data is known. This is for
     *  tests of the algorithm.
     *
     *  @param g function generating the data.
-    *  @param sigma standard deviation of noise.
-	 **/
-	GPR(int dmax, RealArray1D& t, RealFunction g, Real sigma, BasisFunctions* bFcns,
-       RegressionType rt=EMPIRICAL);
+    *  @param sigma standard deviation of data noise.
+    **/
+   GPR(int dmax, RealArray1D& t, RealFunction g, BasisFunctions* bFcns, 
+       Real sigma=0.2, RegressionType rt=EMPIRICAL);
 
 
    /** Sets up empirical regression with clean data from g.
@@ -242,12 +243,16 @@ protected:
 
 private:
 
+   static Real EPS;         // standard deviation smaller than this considered zero
+
    bool have_gaussian;      // flag, Gaussian machinery available
    RegressionType regrType; // flag, type of regression (EMPIRICAL, GAUSSIAN).
    int N;                   // expansions cut off at psi_N
-	int n;                   // points s_j, j=0,...,n.
+   int n;                   // points s_j, j=0,...,n.
+   Real sigma_;             // noise level in data
    RealArray1D s;           // the points s_j, j<=n
    RealArray1D y;           // the values y_j, j<=n
+   RealArray1D yp;          // polluted data y_j+z_j, j<=n for reverse prediction
    RealFunction f;          // function generating the data (NULL if unknown).
    BasisFunctions* basis;   // the basis functions psi_k
    string basis_name;       // name of basis
@@ -256,20 +261,25 @@ private:
    LTRRealMatrix R;         // lower triangular Cholesky root of K.
    RealArray1D mu;          // center of the Gaussian prior
    RealArray1D a;           // Gaussian coefficients
-   RealArray1D empCoeff;    // empirical coefficients
+   RealArray1D b;           // empirical coefficients
+   RealArray1D ap;          // Gaussian coefficients based on the polluted data yp
+   RealArray1D bp;          // empirical coefficients based on the polluted data yp
 
-   Real EA(int k);                      // coefficient a_k=E(A_k) of psi_k
-   Real EC(int k);                      // empirical coefficient of psi_k
+   Real EA(int k, RealArray1D& w);       // coefficient a_k=E(A_k) of psi_k based on data w (=y,yp)
+   Real EC(int k, RealArray1D& w);       // empirical coefficient of psi_k  based on data w (=y,yp)
    Real min_R_jj();
    Real max_R_jj();
-   void diagonal_K_add(Real sigma);
+   void diagonal_K_add(Real delta);
    
    void initBasis();                    // matrix of basis function values
    void computeEmpiricalCoefficients(); // write into coefficient array
    void initGaussian();                 // all data for Gaussian regression
    void computeGaussianCoefficients();  // write into coefficient array
+   // the coefficients based on the polluted data yp
+   const RealArray1D& computePollutedCoefficients();
 
 }; // end GPR
+
 
 
 

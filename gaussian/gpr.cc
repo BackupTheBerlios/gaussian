@@ -12,10 +12,20 @@
 #include <iomanip>
 #include "Random.h"
 #include "plot.h"
+#include <cmath>
 using std::ofstream;
 using std::system;
 using std::setprecision;
+using std::sqrt;
 using namespace Martingale;
+
+
+
+
+
+Real
+GPR::
+EPS=0.000000001;
 
 
 
@@ -51,6 +61,7 @@ GPR::
 addNoise(Real sigma)
 {
    for(int j=0;j<=n;j++) y[j]+=sigma*Random::sTN();
+   sigma_=sqrt(sigma_*sigma_+sigma*sigma);
    computeEmpiricalCoefficients();
    if(have_gaussian) computeGaussianCoefficients();
 }
@@ -92,7 +103,7 @@ GPR::
 setPriorMeanToEmpiricalCoefficients()
 {
     if(regrType==GAUSSIAN)
-    { mu=empCoeff; computeGaussianCoefficients(); }
+    { mu=b; computeGaussianCoefficients(); }
 }
 
 
@@ -115,13 +126,16 @@ setBasisFunctions(BasisFunctions* bFcns)
 
 
 GPR::
-GPR(int dmax, RealArray1D& t, RealArray1D& w, BasisFunctions* bFcns, RegressionType rt):
+GPR(int dmax, RealArray1D& t, RealArray1D& w, BasisFunctions* bFcns,
+    Real sigma, RegressionType rt):
 have_gaussian(false),
 regrType(rt),
 N(dmax),
 n(t.getDimension()-1),
+sigma_(sigma),
 s(t),
 y(w),
+yp(t.getDimension()),
 f(NULL),
 basis(bFcns),
 basis_name(basis->name()),
@@ -130,7 +144,9 @@ K(n+1),
 R(n+1),
 mu(dmax+1),
 a(dmax+1),
-empCoeff(dmax+1)
+b(dmax+1),
+ap(dmax+1),
+bp(dmax+1)
 {
    assert(bFcns!=NULL);
    initBasis();
@@ -147,14 +163,16 @@ empCoeff(dmax+1)
 
 GPR::
 GPR
-(int dmax, RealArray1D& t, RealFunction g, Real sigma,
- BasisFunctions* bFcns, RegressionType rt):
+(int dmax, RealArray1D& t, RealFunction g, 
+ BasisFunctions* bFcns, Real sigma, RegressionType rt):
 have_gaussian(false),
 regrType(rt),
 N(dmax),
 n(t.getDimension()-1),
+sigma_(sigma),
 s(t),
 y(n+1),
+yp(n+1),
 f(g),
 basis(bFcns),
 basis_name(basis->name()),
@@ -163,7 +181,9 @@ K(n+1),
 R(n+1),
 mu(dmax+1),
 a(dmax+1),
-empCoeff(dmax+1)
+b(dmax+1),
+ap(dmax+1),
+bp(dmax+1)
 {
    assert(bFcns!=NULL);
    for(int j=0;j<=n;j++) y[j]=f(s[j])+sigma*Random::sTN();
@@ -184,8 +204,10 @@ have_gaussian(false),
 regrType(EMPIRICAL),
 N(M),
 n(m),
+sigma_(0.0),
 s(m+1),
 y(m+1),
+yp(m+1),
 f(g),
 basis(bFcns),
 basis_name(basis->name()),
@@ -194,7 +216,9 @@ K(m+1),
 R(m+1),
 mu(M+1),
 a(M+1),
-empCoeff(M+1)
+b(M+1),
+ap(M+1),
+bp(M+1)
 {
    // abscissas s_j
    Real u=0.0; if(random) u=0.6;
@@ -218,7 +242,7 @@ void
 GPR::
 computeEmpiricalCoefficients()
 {
-      for(int k=0;k<=N;k++) empCoeff[k]=EC(k);
+      for(int k=0;k<=N;k++) b[k]=EC(k,y);
 }
 
 
@@ -273,7 +297,7 @@ void
 GPR::
 computeGaussianCoefficients()
 {
-   for(int k=0;k<=N;k++) a[k]=EA(k);
+   for(int k=0;k<=N;k++) a[k]=EA(k,y);
 }
 
 
@@ -281,22 +305,24 @@ computeGaussianCoefficients()
 //-----------THE COEFFICIENTS-----------------------------
 
 
+// empirical coefficients
 Real
 GPR::
-EC(int k)
+EC(int k, RealArray1D& w)       // w = y,yp is the data array
 {
    assert((0<=k)&&(k<=N));
 
 	Real sum=0.0;
-	for(int j=0;j<=n;j++) sum+=y[j]*psi(k,j);
+	for(int j=0;j<=n;j++) sum+=w[j]*psi(k,j);
 	return sum/(n+1);
 }
 
 
 
+// Gaussian coefficients
 Real
 GPR::
-EA(int k)
+EA(int k, RealArray1D& w)         // w = y,yp is the data array
 {
   assert((0<=k)&&(k<=N));
 	// compute the r[j]=R_{n+1,j}, 0<=j<=n,
@@ -323,13 +349,13 @@ EA(int k)
 
 	// compute the Z_j, 0<=j<=n
 	RealArray1D Z(n+1);
-	Z[0]=(y[0]-mu_E[0])/R(0,0);
+	Z[0]=(w[0]-mu_E[0])/R(0,0);
 	for(int j=1;j<=n;j++){
 
 		Real sum=0.0;
 		for(int k=0;k<j;k++) sum+=R(j,k)*Z[k];
 
-		Z[j]=(y[j]-mu_E[j]-sum)/R(j,j);
+		Z[j]=(w[j]-mu_E[j]-sum)/R(j,j);
 	}
 
 	// compute a_k=E(A_k), formula 20, p10, gprs.ps
@@ -349,14 +375,11 @@ Real
 GPR::
 expansion(Real t, int q)
 {
-	RealArray1D P=basisFunctionValues(t,q);
-	Real f_q=0.0;
-   if(regrType==GAUSSIAN)
-	   for(int k=0;k<=q;k++) f_q+=a[k]*P[k];
-   else
-      // empirical regression
-      for(int k=0;k<=q;k++) f_q+=empCoeff[k]*P[k];
-	return f_q;
+   RealArray1D P=basisFunctionValues(t,q);
+   RealArray1D d=getCoefficients();
+   Real f_q=0.0;
+   for(int k=0;k<=q;k++) f_q+=d[k]*P[k];
+   return f_q;
 }
 
 
@@ -366,33 +389,29 @@ GPR::
 expansionData(int q)
 {
    assert(q<=N);       
-	ofstream dout("FunctionData.txt");
-	for(int j=0;j<=n;j++) dout << s[j] << "  " << y[j] << endl;
-	dout.close();
+   ofstream dout("FunctionData.txt");
+   for(int j=0;j<=n;j++) dout << s[j] << "  " << y[j] << endl;
+   dout.close();
 
-	// write the expansions f_0,f_1,...,f_q evaluated at 801 points
-	// to a file in gnuplot data format.
-	ofstream fout("ExpansionData.txt");
-	int m=800;
-	for(int j=0;j<=m;j++){
+   // write the expansions f_0,f_1,...,f_q evaluated at 801 points
+   // to a file in gnuplot data format.
+   ofstream fout("ExpansionData.txt");
+   int m=800;
+   for(int j=0;j<=m;j++){
 
-	   Real t=-1.0+j*2.0/m;
-	   fout << t << "  ";
+      Real t=-1.0+j*2.0/m;
+      fout << t << "  ";
       // if f is known (f!=NULL) write f
       if(f) fout << f(t) << "  ";
-	   RealArray1D psi=basisFunctionValues(t,q);
-	   Real sum=0.0;
-      if(regrType==EMPIRICAL)
-	     for(int i=0;i<=q;i++){ sum+=empCoeff[i]*psi[i]; fout << sum << "  "; }
-      else
-        for(int i=0;i<=q;i++){ sum+=a[i]*psi[i]; fout << sum << "  "; }
-	   fout << endl;
+      RealArray1D psi=basisFunctionValues(t,q);
+      RealArray1D d=getCoefficients();
+      Real sum=0.0;
+      for(int i=0;i<=q;i++){ sum+=d[i]*psi[i]; fout << sum << "  "; }
+      fout << endl;
    }
    fout.close();
    cout << endl << endl << endl
         << "Coefficients: " << getCoefficients() << endl;
-   //leaveOneOutCV();
-   polluteAndPredictCV();
 }
 
 			
@@ -456,9 +475,9 @@ conditioning()
 
 void
 GPR::
-diagonal_K_add(Real sigma)
+diagonal_K_add(Real delta)
 {
-   for(int j=0;j<=n;j++) K(j,j)+=sigma;
+   for(int j=0;j<=n;j++) K(j,j)+=delta;
    R=K.ltrRoot();
    if(have_gaussian) computeGaussianCoefficients();
 }       
@@ -481,7 +500,7 @@ orthoTest(int q, int m)
 	}
 	// Scale B by 1/sqrt(n), this scales BB' by 1/n and then
 	// orthonormality with Monte Carlo integration is equivalent to BB'=I.
-	Real f=1.0/sqrt(m+1); B*=f;
+	Real f=1.0/sqrt(float(m+1)); B*=f;
 
 	cout << "Orthonormality: matrix of L^2 inner products (psi_i,psi_j):"
         << endl << endl
@@ -588,7 +607,7 @@ setUp()
    if(rt==1) rType=GPR::GAUSSIAN; else rType=GPR::EMPIRICAL;
 
    // REGRESSOR
-   GPR* gpr=new GPR(N,t,f,sigma,bFcns,rType);
+   GPR* gpr=new GPR(N,t,f,bFcns,sigma,rType);
 
    // SET PRIOR MEAN
    if(rType==GPR::GAUSSIAN){
@@ -664,6 +683,7 @@ setUp()
 
 
 // still very inefficient since Cholesky root and kernel matrix fully recomputed.
+// will not be fixed since this method is useless
 int
 GPR::
 leaveOneOutCV()
@@ -702,22 +722,21 @@ int
 GPR::
 polluteAndPredictCV()
 {
-    RealArray1D error(N+1);     
-    RealArray1D w(n+1);
-    for(Real sigma=0.2;sigma<0.3;sigma+=0.1){
+    RealArray1D error(N+1);    // error[q]=error(f_q)
+
+    // error is average over 3 trials
+    for(int d=0;d<3;d++){
 
        // pollute data with Gaussian noise of standard deviation sigma
-       for(int j=0;j<=n;j++) w[j]=y[j]+sigma*Random::sTN();
-       GPR vGpr(N,s,w,basis,regrType);
-       const RealArray1D& a=vGpr.getCoefficients();
-       const RealMatrix&  psi=vGpr.get_psi();
+       for(int j=0;j<=n;j++) yp[j]=y[j]+sigma_*Random::sTN();
+       RealArray1D d=computePollutedCoefficients();
        // compute the prediction error at s_k for all the f_q
        for(int k=0;k<=n;k++){     // error at s_k
 
           Real f_q=0;
           for(int q=0;q<=N;q++){     // error of f_q
 
-              f_q+=a[q]*psi(q,k);     // f_q(s_j)
+              f_q+=d[q]*psi(q,k);     // f_q(s_j)
               error[q]+=(y[k]-f_q)*(y[k]-f_q);
           }       
        } // error vector at noise level sigma is computed
@@ -726,8 +745,29 @@ polluteAndPredictCV()
     int m=0; Real err=100000000;
     // enforce geometric decay of error as degree q of expansion increases
     // and discard f_N since this has inexplicably low errors
-    for(int q=0;q<N;q++)
-    if(error[q]<(basis->roughnessPenalty(q))*err){ err=error[q]; m=q; }
+    for(int q=0;q<N;q++){
 
+       // reduce roughness penalty in case of exact data.
+       Real k_q = (sigma_<EPS) ? 1.0 : basis->roughnessPenalty(q);
+       if(error[q]<k_q*err){ err=error[q]; m=q; }
+    }
     return m;
 }
+
+
+const RealArray1D&
+GPR::
+computePollutedCoefficients()
+{
+   if(sigma_<EPS) return getCoefficients();
+   // empirical polluted coefficients
+   if(regrType==EMPIRICAL){
+
+      for(int k=0;k<=N;k++) bp[k]=EC(k,yp);
+      return bp;
+   }
+   // Gaussian polluted coefficients
+   for(int k=0;k<=N;k++) ap[k]=EA(k,yp);
+   return ap;
+}
+   
