@@ -78,6 +78,16 @@ public:
     **/
    void addFunction(RealArray1D& y);
 
+   /** Adds the points \f$(t_j,y_j)\f$ as solid red squares.
+    *  y and t must be arrays of at least length n.
+    **/
+   void addPoints(Real* y, Real* t, int n);
+
+   /** Adds the points \f$(t_j,y_j)\f$ as solid red squares.
+    *  y and t must be arrays of the same length.
+    **/
+   void addPoints(const RealArray1D& y, const RealArray1D& t);
+
 }; 
 
 

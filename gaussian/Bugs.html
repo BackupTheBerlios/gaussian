@@ -60,7 +60,15 @@ Implement choice to set N=k*n, with k chosen by user.
 <code>Plot.h: PSPlot</code> Implement a method that allows us to plot the data points.
 
 
+<h3>6-24-04</h3>
 
+<code>GPR:</code> Leave one out cross validation works for empirical regression but
+not for Gaussian regression. In the latter case it always chooses the highest index q as optimal.
+Why is that?  Implementation is still very inefficient as kernel matrix and Cholesky root
+are fully recomputed.
+<p>
+Fix up <code>Plot::addFunction, addPoints</code> so as to include a legend.
+Hand in name as string parameter.
 
 
 

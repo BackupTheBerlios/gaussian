@@ -39,7 +39,7 @@ c(0)
          wspan=wmax-wmin;
 
     // display is square, so set fspace so that bounding box has
-    // golden ratio
+    // golden ratio (horizontal squeeze by 1+GR).
     fspace(tmin,wmin,tmax,wmin+(1+GR)*wspan);    
      
     // draw biggest box displayed
@@ -97,6 +97,31 @@ addFunction(RealArray1D& y)
 }
 
 
+void
+PSPlot::
+addPoints(Real* y, Real* t, int n)
+{
+   colorname("red");
+   filltype(1);    
+   Real r=(xmax-xmin)/800;
+   // to get squares compensate for the horizontal squeeze by 1+GR
+   for(int j=0;j<n;j++) fbox(t[j]-r,y[j]-2*r*(1+GR),t[j]+r,y[j]+2*r*(1+GR));
+   colorname("white");
+   filltype(0);       
+}
+
+
+void
+PSPlot::
+addPoints(const RealArray1D& y, const RealArray1D& t)
+{
+   int n=y.getDimension(),
+       m=t.getDimension();
+   assert(n==m);
+   Real* w=y.getData();
+   Real* s=t.getData();
+   addPoints(w,s,n);
+}
 
 
 

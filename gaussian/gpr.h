@@ -37,8 +37,11 @@ public:
    /** Parameter n = number of data points - 1. */
    int get_n(){ return n; }
 
-   /** The ponits \f$s_j\f$. */ 
-   RealArray1D& get_s(){ return s; }
+   /** The points \f$s_j\f$. */ 
+   const RealArray1D& get_s() const { return s; }
+
+   /** The values \f$y_j=f(s_j)+noise\f$. */
+   const RealArray1D& getFunctionData() const { return y; }
 
    /** Current regression type (EMPIRICAL, GAUSSIAN). */
    RegressionType getRegressionType() const { return regrType; }
@@ -49,11 +52,18 @@ public:
     */
    void setRegressionType(RegressionType rt);
 
+   /** The matrix \f$(\psi_i(s_j))\f$. */
+   const RealMatrix& get_psi() const { return psi; }
+
    /** The vector of empirical coefficients. */
    const RealArray1D& getEmpiricalCoefficients() const { return empCoeff; }
 
-   /** The vector of empirical coefficients. */
+   /** The vector of Gaussian coefficients. */
    const RealArray1D& getGaussianCoefficients() const { return a; }
+
+   /** The vector of coefficients used by the current regression. */
+   const RealArray1D& getCoefficients() const
+   { if(regrType==EMPIRICAL) return empCoeff; return a; }
 
    /** Is the Gaussian machinery enabled?
     */
@@ -126,8 +136,12 @@ public:
    /** Sets up empirical regression with clean data from g.
     *
     * @param random data points \f$s_j\f$ evenly spaced or random.
+    * @param M M+1 basis functions.
+    * @param m m+1 data points.
     */
    GPR(int M, int m, RealFunction g, BasisFunctions* bFcns, bool random);
+
+
 
 
 
@@ -169,6 +183,15 @@ public:
 	 *
     **/
    void expansionData(int q);
+
+
+//-----------------CROSS VALIDATION---------------------------------
+
+
+   /** Leave one out cross validation.
+    *  @returns index q of \$f_q\f$ with minimal error.
+    */
+   int leaveOneOutCV();
 
 
 //------------------TESTS--------------------------------------------
@@ -238,6 +261,8 @@ private:
    void computeGaussianCoefficients();  // write into coefficient array
 
 }; // end GPR
+
+
 
  
 

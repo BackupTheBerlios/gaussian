@@ -365,7 +365,7 @@ void
 GPR::
 expansionData(int q)
 {
-  assert(q<=N);       
+   assert(q<=N);       
 	ofstream dout("FunctionData.txt");
 	for(int j=0;j<=n;j++) dout << s[j] << "  " << y[j] << endl;
 	dout.close();
@@ -389,6 +389,8 @@ expansionData(int q)
 	   fout << endl;
    }
    fout.close();
+   cout << endl << endl << endl
+        << "Optimal q, leave one out cross validation: " << leaveOneOutCV();
 }
 
 			
@@ -656,5 +658,41 @@ setUp()
 
 
 
+//----------------CROSS VALIDATION-----------------------------
+
+
+// still very inefficient since Cholesky root and kernel matrix fully recomputed.
+int
+GPR::
+leaveOneOutCV()
+{
+    RealArray1D error(N+1);
+    RealArray1D t(n);
+    RealArray1D w(n);
+    for(int k=0;k<=n;k++){       // leave out s_k
+
+        for(int j=0;j<k;j++) { t[j]=s[j]; w[j]=y[j]; }
+        for(int j=k;j<n;j++) { t[j]=s[j+1]; w[j]=y[j+1]; }
+
+        // allocate the validating GPR
+        GPR vGpr(N,t,w,basis,regrType);  
+        const RealArray1D& a=vGpr.getCoefficients();
+        const RealMatrix&  psi=vGpr.get_psi();
+        // compute the prediction error at s_k for all the f_q
+        Real f_q=0;
+        for(int q=0;q<=N;q++){
+
+           f_q+=a[q]*psi(q,k);     // f_q(s_j)
+           error[q]+=(y[k]-f_q)*(y[k]-f_q);
+        }
+    } // error vector is computed
+
+    int m=0; Real err=100000000;
+    for(int q=0;q<=N;q++)
+       if(error[q]<err){ err=error[q]; m=q; }
+cout << endl << endl << error;
+    return m;
+}
+    
 
 

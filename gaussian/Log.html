@@ -29,5 +29,20 @@ For experimentation. Streamlines the <code>GPR:: setUP()</code> procedure.
 Fixed up <code>RegressionPlots::regressionPlots()</code>. Now works, allocates directories and copies files
 correctly. Many new get/set functions in <code>GPR</code>. Objects can now be fully reconfigured after construction.
 
+
+<h3>6-24-04</h3>
+
+<code>GPR:</code>
+We now add <code>DELTA*I</code> to the kernel matrix to ensure positive definiteness
+(DELTA=0.01). Condition number of $R$ is reported, DELTA can be increased to improve the
+condition number.
+<p>
+Leave one out cross validation implemented, still bug ridden. 
+<p>
+Fix up <code>Plot::addFunction, addPoints</code> so as to include a legend.
+Hand in name as string parameter.
+
+
+
 </body>
 </html>
