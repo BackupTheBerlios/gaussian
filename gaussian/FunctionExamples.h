@@ -36,7 +36,7 @@ Real f1(Real t);
  **/
 Real f2(Real t);
 
-/** \f$f(t)=|t|^{1/3}\f$.
+/** \f$f(t)=f1(t)+t^2sin(11\pi t)\f$.
  **/
 Real f3(Real t);
 
