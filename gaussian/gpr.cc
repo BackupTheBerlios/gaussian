@@ -390,7 +390,8 @@ expansionData(int q)
    }
    fout.close();
    cout << endl << endl << endl
-        << "Optimal q, leave one out cross validation: " << leaveOneOutCV();
+        << "Coefficients: " << getCoefficients() << endl;
+   leaveOneOutCV();
 }
 
 			
@@ -595,7 +596,7 @@ setUp()
       cout << "\nMean of Gaussian prior P:" << endl
            << "origin....................[0]" << endl
            << "empirical coefficients....[1]" << endl
-           << "vector (r,r,...,r)........[2]"
+           << "vector (r,r,...,r)........[2]" << endl
            << "Default is [0]"
            << endl << endl
            << "Mean=[0,1,2]=";
@@ -688,9 +689,10 @@ leaveOneOutCV()
     } // error vector is computed
 
     int m=0; Real err=100000000;
-    for(int q=0;q<=N;q++)
-       if(error[q]<err){ err=error[q]; m=q; }
-cout << endl << endl << error;
+    for(int q=0;q<=N;q++) if(error[q]<err){ err=error[q]; m=q; }
+
+cout << endl << endl << "Leave one out error vector: " << error;
+cout << endl << endl << "Optimal q: " << m;
     return m;
 }
     
