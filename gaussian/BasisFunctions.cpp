@@ -74,8 +74,8 @@ values(Real x, int m)
    RealArray1D P(m+1);
    // recall that we are using normalized Lebesgue measure 0.5*dt on [-1,+1]
    // (affects the empirical coefficients)
-   for(int k=0;k<=m;k+=2) P[k]=SQRT_TWO*cos(k*PI*x);
-   for(int k=1;k<=m;k+=2) P[k]=SQRT_TWO*sin(k*PI*x);
+   for(int k=0;k<=m;k+=2) P[k]=SQRT_TWO*cos((k/2)*PI*x);
+   for(int k=1;k<=m;k+=2) P[k]=SQRT_TWO*sin((1+k/2)*PI*x);
    
 	return P;
 }
