@@ -101,9 +101,9 @@ void LoopStatus::consoleReport(int n, int N)
         Int_t Hrs(hrs), Mins(mins), Secs(secs);
         
 	    string
-	        hours   = Hrs.toString(),
-	    	minutes = Mins.toString(),
-		    seconds = Secs.toString();
+ 	         hours = Hrs.str(),
+	       minutes = Mins.str(),
+		    seconds = Secs.str();
 	
 	    clear();
 	

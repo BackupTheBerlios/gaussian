@@ -18,8 +18,33 @@
 
 #include "BasisFunctions.h"
 #include <cmath>
+#include "plot.h"
 using std::sin;
 using std::cos;
+
+
+void
+BasisFunctions::
+print(int q)
+{
+   ofstream fout(cname());
+   PSPlot plot(fout,-1.0,+1.0,ymin(q),ymax(q));
+   // evaluate each basis function at 800 evenly spaced points in [-1,+1]
+   // and fill the first q basis functions into the rows of psi
+   RealArray2D psi(q,801);   
+   for(int j=0;j<801;j++){
+
+      Real t=-1.0+j*0.0025;
+      RealArray1D psi_t=values(t,q);
+      for(int k=0;k<q;k++) psi(k,j)=psi_t[k];
+   }
+   // add the rows to the plot
+   for(int k=0;k<q;k++) plot.addFunction(psi[k],801);
+}
+      
+      
+      
+      
 
 
 RealArray1D
@@ -54,4 +79,8 @@ values(Real x, int m)
    for(k=1;k<=m;k+=2) P[k]=2*sin(k*PI*x);
    
 	return P;
-} 
+}
+
+
+
+

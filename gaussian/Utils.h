@@ -80,12 +80,14 @@ public:
 	
     Type_t(T t0): t(t0) { }
   
-    string toString()
+    string str()
     {
          std::ostringstream os;
          os<<t;
          return os.str();
     }
+
+    const char* cstr() { return str().cstr(); }
 	
 }; // end Type_t
 

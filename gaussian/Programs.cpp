@@ -1,7 +1,7 @@
 /***************************************************************************
-                          main.cpp  -  description
+                          Programs.cpp  -  description
                              -------------------
-    begin                : Sun Jun  6 03:04:25 PDT 2004
+    begin                : Fri Jun 18 2004
     copyright            : (C) 2004 by 
     email                : 
  ***************************************************************************/
@@ -15,19 +15,52 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "Programs.h"
-#include <cstdlib>
+#include "Array.h"
+#include "gpr.h"
+#include "RegressionPlots.h"
+#include "plot.h"
+#include <fstream>
+using std::ofstream;
 
-int main(int argc, char *argv[])
+
+
+void
+plotTest()
 {
-  //interactiveRegression();
-  //GPR::printBasisFunctions(9);
-  regressionPlots();
-  //plotTest();
+   // output file
+   ofstream fout("test_plot.eps");
+   PSPlot plot(fout,-1.0,+1.0,-1.2,+1.2);
+   RealArray1D sine(401);
+   RealArray1D expfn(401);
 
-  return EXIT_SUCCESS;
+   for(int t=0;t<=400;t++){
+      Real x=-1.0+1.0*t/200;
+      sine[t]=sin(TWO_PI*x);
+      expfn[t]=exp(-2*x*x);
+   }
+
+   plot.addFunction(expfn);
+   plot.addFunction(sine);
 }
+
+
+
+void
+interactiveRegression()
+{
+   GPR& gpr=GPR::setUp();
+   int N=gpr.get_N();
+   gpr.expansionData(N);
+}
+
+
+
+void
+regressionPlots()
+{
+   RegressionPlots::regressionPlots();
+}
+
+
+

@@ -21,118 +21,164 @@ using std::string;
 
 
 
-/** Gaussian process regression on [-1,+1] using expansion in
+/** Empirical and Gaussian process regression on [-1,+1] using expansion in
  *  basis functions. See gprs.ps.
  **/
 class GPR {
 	
 public:
 
-   /** Flag, center of Gaussian prior (origin or empirical coefficients).
-    **/
+   /** Flag, center of Gaussian prior (origin or empirical coefficients). */
    enum RegressionType {EMPIRICAL, GAUSSIAN};
 
+   /** Maximal expansion length: \f$\psi_0,\psi_1,\dots,\psi_N\f$. */
+   int get_N(){ return N; }
+
+   /** Parameter n = number of data points - 1. */
+   int get_n(){ return n; }
+
+   /** The ponits \f$s_j\f$. */ 
+   RealArray1D& get_s(){ return s; }
+
+   /** Current regression type (EMPIRICAL, GAUSSIAN). */
+   RegressionType getRegressionType() const { return regrType; }
+   
    /** Set the type of regression (EMPIRICAL, GAUSSIAN).
-    **/
-   void setRegressionType(RegressionType& rt){ regrType=rt; }
+    *  Don't set it to GAUSSIAN on very large data sets (>1000 points).
+    *  The matrix omputations are too slow in this case.
+    */
+   void setRegressionType(RegressionType rt);
+
+   /** The vector of empirical coefficients. */
+   const RealArray1D& getEmpiricalCoefficients() const { return empCoeff; }
+
+   /** The vector of empirical coefficients. */
+   const RealArray1D& getGaussianCoefficients() const { return a; }
+
+   /** Is the Gaussian machinery enabled?
+    */
+   bool haveGaussian() const { return have_gaussian; }
 
    /** Set the mean of the Gaussian prior P equal to mean.
-    **/
-   void setPriorMean(RealArray1D& mean)
-   { mu=mean; recomputeGaussianCoefficients(); }
+    *  Does nothing if regression type is empirical.
+    */
+   void setPriorMean(const RealArray1D& mean);
 
    /** Set the mean of the Gaussian prior P equal to mean.
-    **/
-   void setPriorMeanToOrigin()
-   {
-      RealArray1D origin(n+1); mu=origin;
-      recomputeGaussianCoefficients();
-   }
+    *  Does nothing if regression type is empirical.
+    */
+   void setPriorMeanToOrigin();
 
    /** Set the mean of the Gaussian prior P equal to mean.
-    **/
-   void setPriorMeanToEmpiricalCoefficients()
-   { mu=empCoeff; recomputeGaussianCoefficients(); }
+    *  Does nothing if regression type is empirical.
+    */
+   void setPriorMeanToEmpiricalCoefficients();
 
-   void setBasisFunctions(BasisFunctions* bFcns)
-   { delete basis; basis=bFcns; fullInitialization(); }
+   /** Set the basis functions (must recompute all data structures).*/
+   const BasisFunctions* getBasisFunctions(){ return basis; };
 
-   /** The sequence \f$(\psi_0(t),\psi_1(t),\dots,\psi_m(t))\f$ of the basis
-    *  functions evaluated at t.
-    **/
-   RealArray1D basisFunctionValues(Real t, int m)
-   { return basis->values(t,m); }
+   /** Set the basis functions (must recompute all data structures).*/
+   void setBasisFunctions(BasisFunctions* bFcns);
 
-   /** Designation of basis functions. **/
-   string basisName(){ return basis->name(); }
+   /** Set the function data array.*/
+   void setFunctionData(RealArray1D& w);
 
-   /** "empirical" or "Gaussian". **/
-   string regressionType();
+   /** Set the function underlying the data. This fills the function data
+    *  array with <i>exact</i> data. Add noise if desired.
+    */
+   void setFunction(RealFunction g);
 
-   /** The lower triangular Cholesky root of the kernel matrix 
-    *  \f$(K(s_i,s_j))\f$.
-    **/
-   LTRRealMatrix& getR(){ return R; }
-	
+   /** Adds independent gaussian noise of standard deviation sigma
+    *  to the function data. (recomputes all coefficients).
+    */
+   void addNoise(Real sigma);
+
+
+//---------------CONSTRUCTORS---------------------------
+
    /** The regression type is set to GAUSSIAN and the
     *  prior mean to the origin. Use public methods to change this
-    *  setup. 
+    *  setup. If the data set is very large (<1000 points) we may not
+    *  want to enable the Gaussian machinery (large matrices) and try to get
+    *  by with empirical regression.
     *
     *  @param dmax maximum degree N of expansion.
     *  @param t data abscissas \f$t_j,\ 0<=j<=n\f$.
 	 *  @param w function data \f$w_j=f(t_j),\ 0<=j<=n\f$.
     *  @param bFcns object containing the basis functions.
+    *  @param rt type of regression (EMPIRICAL, GAUSSIAN),
+    *  EMPIRICAL does not initialize the Gaussian data structures.
 	 **/
-	GPR(int dmax, RealArray1D& t, RealArray1D& w, BasisFunctions* bFcns);
-	
+	GPR(int dmax, RealArray1D& t, RealArray1D& w, BasisFunctions* bFcns,
+       RegressionType rt=EMPIRICAL);
+
+   /** As {@link GPR(int,RealArray1D&,RealArray1D&,BasisFunctions*,RegressionType)}
+    *  except that the function generating the data is known. This is for
+    *  tests of the algorithm.
+    *
+    *  @param g function generating the data.
+    *  @param sigma standard deviation of noise.
+	 **/
+	GPR(int dmax, RealArray1D& t, RealFunction g, Real sigma, BasisFunctions* bFcns,
+       RegressionType rt=EMPIRICAL);
+
+
+   /** Sets up empirical regression with clean data from g.
+    *
+    * @param random data points \f$s_j\f$ evenly spaced or random.
+    */
+   GPR(int M, int m, RealFunction g, BasisFunctions* bFcns, bool random);
+
+
+
+//--------------------EXPANSIONS--------------------------------------------
+
+
+   /** The sequence \f$(\psi_0(t),\psi_1(t),\dots,\psi_m(t))\f$ of the
+    *  basis functions evaluated at t.
+    */
+   RealArray1D basisFunctionValues(Real t, int m)
+   { return basis->values(t,m); }
+
+   /** Sets up a Gaussian process regressor {@link GPR} with function examples
+    *  via a dialogue with the user. User must delete the GPR object.
+    */
+   static GPR& setUp();	
+
 	/** The expansion \f$f_q(t)\f$ using Gaussian or empirical coefficients \f$a_k\f$
 	 *  depending on the current state of <code>this</code>.
 	 **/
 	Real expansion(Real t, int q);
-	
-	/** Writes data files for the expansions expansions \f$f_0,f_1,\dots,f_q\f$ of
+
+   /** Writes data files for the expansions expansions \f$f_0,f_1,\dots,f_q\f$ of
 	 *  f in Legendre polynomials on [-1,+1] with coefficients computed by
 	 *  Gaussian regression for potting with gnuplot.
-	 *  
+	 *
 	 *  The expansions are evaluated at 801 evenly spaced points \f$t_j\in[-1+1]\f$
 	 *  and written to a file "ExpansionData.txt" in gnuplot data format.
     *  The first column contains the points \f$t_j\f$, the next column the true
-	 *  function values \f$f(t_j)\f$ and the subsequent columns the expansions
+	 *  function values \f$f(t_j)\f$ (if the function f generating the data is known
+    *  otherwise skipped) and the subsequent columns the expansions
 	 *  \f$f_0(t_j),f_1(t_j),\dots,f_q(t_j)\f$.
 	 *
 	 *  See "doc/gnuplot_Readme.html" for instructions how to plot such data
 	 *  with gnuplot.
 	 *
-    *  The data points are written to the file "FunctionData.txt" to be overlaid
-	 *  with the graph of the function f in the plot. The first columns
+    *  The data points are written to the file "FunctionData.txt". The first column
 	 *  contains the points \f$s_j\f$ and the second column the data points \f$y_j\f$.
 	 *
-	 *  Note: the parameter f must be the function that set up the array
-	 * <code>this::y</code>, that is, we must have \f$y_j=f(s_j)\f$.
-    *
-    * @param f pointer to pointer to function to be expanded.
-    **/	
-   void expansionData(RealFunction f, int q);
-
-   /** Writes the data files (see {@link expansionData(RealFunction,int)})
-	 *  for plotting the regressors \f$f_0,f_1,\dots,f_N\f$ of the function \f$f(t)\f$
-    *  with gnuplot. User chooses from several sample functions.
-    *  The mean of the Gaussian prior P can be set to the origin, the vector of
-    *  empirical coefficients or the vector (r,r,...,r), with r a real number.
-    *  This last option is included to investigate the dependence of the
-    *  algorithm on the mean of P.
-	 *
-	 *  The coefficients are computed from the data points \f$y_j=f(s_j)\f$,
-	 *  \f$0\leq j\leq n\f$. The points \f$s_j\f$ can be evenly spaced in [-1,+1]
-	 *  with \f$s_0=-1\f$, \f$s_n=+1\f$ or they can be uniformly random.
-	 *  The function values \f$y_j=f(s_j)\f$ can be exact or corrupted by
-	 *  independent Gaussian noise. Noisy data are of the form
-	 *  \f[y_j=f(s_j)+\sigma Z_j,\f]
-	 *  where the \f$Z_j\f$ are independent and standard normal. That is the standard 
-	 *  deviation of the error is independent of the size of \f$f(s_j)\f$.
-	 *  The user supplies all parameters.
     **/
-   static void regressionExample();
+   void expansionData(int q);
+
+
+//------------------TESTS--------------------------------------------
+
+
+   /** Allocates a directory <code>bases</code> and prints a plot of the
+    *  first q basis functions for each of the bases which are implemented.
+    **/
+   static void printBasisFunctions(int q);
+
 
    /** Tests the basis functions \f$\psi_0,\dots,\psi_q\f$ for orthonormality
     *  using Monte Carlo integration on m random points in [-1,+1].
@@ -140,29 +186,27 @@ public:
     **/
    void orthoTest(int q, int m);
 
-   /** Prints the values \f$\psi_i(t_j)\f$ of the basis functions
-    *  \f$\psi_i\f$ on [-1,+1] for \f$i=0,1,\dots,q\f$ at evenly spaced points
-    *  \f$t_j\in[-1,+1]\f$, \f$j=0,1,...,m\f$ to the file BasisFunctionsData.txt in
-	 *  gnuplot data format.
-	 *
-	 *  The first column contains the points \f$t_j\f$ and the next columns
-	 *  contain \f$\psi_0(t_j),\psi_1(t_j),\dots,\psi_q(t_j)\f$. See
-	 *  "doc/gnuplot_Readme.html" for instructions to plot these data
-	 *  with gnuplot.
-    **/
-   void basisFunctionData(int q, int m);
+  
 
-   /** Runs {@link basisFunctionData} after user supplies parameters. **/
-   static void printBasisFunctions();	
+protected: 
 
+
+   /** The lower triangular Cholesky root of the kernel matrix 
+    *  \f$(K(s_i,s_j))\f$.
+    */
+   LTRRealMatrix& getR(){ return R; }
+	
+	
 
 private:
 
+   bool have_gaussian;      // flag, Gaussian machinery available
    RegressionType regrType; // flag, type of regression (EMPIRICAL, GAUSSIAN).
    int N;                   // expansions cut off at psi_N
 	int n;                   // points s_j, j=0,...,n.
    RealArray1D s;           // the points s_j, j<=n
    RealArray1D y;           // the values y_j, j<=n
+   RealFunction f;          // function generating the data (NULL if unknown).
    BasisFunctions* basis;   // the basis functions psi_k
    string basis_name;       // name of basis
 	RealMatrix psi;          // basis functions psi(k,j)=psi_k(s_j), 0<=k<=N, 0<=j<=n.
@@ -174,11 +218,11 @@ private:
 
    Real EA(int k);   // coefficient a_k=E(A_k) of psi_k
    Real EC(int k);   // empirical coefficient of psi_k
-	void writeCoefficients();
-   void recomputeGaussianCoefficients();
-   void fullInitialization();
 
-
+   void initBasis();                    // matrix of basis function values
+   void computeEmpiricalCoefficients(); // write into coefficient array
+   void initGaussian();                 // all data for Gaussian regression
+   void computeGaussianCoefficients();  // write into coefficient array
    		
 }; // end GPR
 

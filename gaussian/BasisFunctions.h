@@ -37,7 +37,24 @@ public:
 
    /** Designation of basis.
     **/
-   virtual string name()=0;
+   virtual string name() const =0;
+
+   /** Designation of basis.
+    **/
+  const char* cname() const { return name().c_str(); }
+
+   /** Tight lower bound for the first q basis functions.
+    *  Used only in drawing graphs of the basis functions.
+    */
+   virtual Real ymin(int q)=0;
+
+   /** Tight upper bound for the first q basis functions.
+    *  Used only in drawing graphs of the basis functions.
+    */
+   virtual Real ymax(int q)=0;   
+
+   /** Print an EPS graph of the first q basis functions. **/
+   void print(int q);
 
 };
 
@@ -48,7 +65,9 @@ class LegendreBasis : public BasisFunctions {
 public:
 
    RealArray1D values(Real x, int m);
-   string name(){ return "orthonormal Legendre basis"; }
+   string name() const { return "Legendre_basis"; }
+   Real ymin(int q){ return -5.0; }
+   Real ymax(int q){ return 5.0; }
 };
 
 
@@ -58,5 +77,7 @@ class FourierBasis : public BasisFunctions {
 public:
 
    RealArray1D values(Real x, int m);
-   string name(){ return "orthonormal Fourier basis"; }
+   string name() const { return "Fourier_basis"; }
+   Real ymin(int q){ return -2.2; }
+   Real ymax(int q){ return 2.2; }
 };

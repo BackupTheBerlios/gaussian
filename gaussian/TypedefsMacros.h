@@ -35,8 +35,16 @@ using std::endl;
 #define MTGL_END_NAMESPACE(name) }
 
 
+
+#define PI 3.14159265358979323846
 #define TWO_PI 6.28318531
-#define PI 3.14159266
+#define LNPI 1.14472988584940016
+#define LNSQRT2PI 0.9189385332046727
+#define PNT68 0.6796875
+#define SQRT_TWO 1.414213562373095049
+
+#define GR 0.6180339887    // golden ratio, 1/GR=1+GR
+
 #define SMALL 30
 
 // the basic scalar type

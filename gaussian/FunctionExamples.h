@@ -26,31 +26,22 @@ using namespace Martingale;
 
 /** \f$f(t)=sin(2\pi t)\f$.
  **/
-Real f_0(Real t);
+Real f0(Real t);
 
 /** \f$f(t)=20t^{1/3}exp(-6t)\f$.
  **/
-Real f_1(Real t);
+Real f1(Real t);
 
 /** \f$f(t)=|t|\f$.
  **/
-Real f_2(Real t);
+Real f2(Real t);
 
 /** \f$f(t)=|t|^{1/3}\f$.
  **/
-Real f_3(Real t);
+Real f3(Real t);
 
-/** Sets regression parameters from user input.
- *
- * @param N index of last basis function.
- * @param n number of data points-1.
- * @param s array of data point x-coordinates.
- * @param y array of y_j=f(s_j).
- * @returns pointer to function to be expanded.
- *
- **/
-RealFunction expansionDialog
-(int& N, int& n, RealArray1D& s, RealArray1D& y);
+/** The j-th function exmple. */
+RealFunction functionExample(int j);
 
 
 #endif

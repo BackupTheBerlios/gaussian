@@ -27,7 +27,8 @@ spyqqqdia@yahoo.com
 #include "TypedefsMacros.h"
 #include <cstdlib>                       // for exit()
 #include <string>
-
+#include <fstream>
+using std::ostream;
 using std::string;
 
 MTGL_BEGIN_NAMESPACE(Martingale)
@@ -297,6 +298,7 @@ public:
 
 
 
+
 /**********************************************************************************
  *
  *         2 DIMENSIONAL   ARRAY
@@ -404,6 +406,7 @@ public:
 	   #endif	
 	   return dptr[i-b1];
    }
+   
    
    std::ostream& printSelf(std::ostream& os) const
    {
@@ -544,6 +547,9 @@ public:
 typedef Array1D<Real> RealArray1D;
 typedef Array2D<Real> RealArray2D;
 typedef Array3D<Real> RealArray3D;
+
+ostream&
+operator << (ostream& os, const RealArray1D& y);
 
 typedef Array1D<int> IntArray1D;
 typedef Array2D<int> IntArray2D;
