@@ -29,7 +29,7 @@ spyqqqdia@yahoo.com
 #include "Array.h"
 
 
-MTGL_BEGIN_NAMESPACE(Martingale)
+GPR_BEGIN_NAMESPACE(Gaussian)
 
 
 
@@ -306,4 +306,4 @@ matrixFunction(Real (*f)(Real))
 
 
 
-MTGL_END_NAMESPACE(Martingale)
+GPR_END_NAMESPACE(Gaussian)

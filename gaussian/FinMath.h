@@ -27,8 +27,8 @@ spyqqqdia@yahoo.com
 #include "TypedefsMacros.h"
 
 
-MTGL_BEGIN_NAMESPACE(Martingale)
-MTGL_BEGIN_NAMESPACE(FinMath)	
+GPR_BEGIN_NAMESPACE(Gaussian)
+GPR_BEGIN_NAMESPACE(FinMath)	
 
 
 
@@ -201,7 +201,7 @@ Real blackImpliedAggregateCallVolatility(Real Q, Real k, Real y);
 
 
 
-MTGL_END_NAMESPACE(FinMath)
-MTGL_END_NAMESPACE(Martingale)	
+GPR_END_NAMESPACE(FinMath)
+GPR_END_NAMESPACE(Gaussian)
 
 #endif

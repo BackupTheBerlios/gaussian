@@ -16,21 +16,42 @@
  ***************************************************************************/
 
 #include "Functionals.h"
-#include "GPR.h"
+#include "gpr.h"
+
+
+GPR_BEGIN_NAMESPACE(Gaussian)
+
+
+
+
+//----------------FUNCTIONAL----------------------------
+
+Functional::
+Functional(GPR& gp):
+gpr(&gp)
+{  }
+
 
 
 //----------------LINEAR FUNCTIONAL----------------------------
 
+
+LinearFunctional::
+LinearFunctional(GPR& gp) :
+Functional(gp)
+{  }
+
+
 Real
 LinearFunctional::
-mean()
+mean() const
 {
    GPR* gpr=getGPR();
    int N=gpr->get_N();
    // the vector of unconditional expectations E[A_k]:
    const RealArray1D& mu=gpr->getPriorMean();
    // the sequence of values integral(gpr->psi_k)
-   const RealArray1D l=valuesOnBasisFunctions((gpr);
+   const RealArray1D l=valuesOnBasisFunctions();
    Real I=0.0;
    for(int k=0;k<=N;k++) I+=mu[k]*l[k];
    return I;
@@ -39,15 +60,15 @@ mean()
 
 Real
 LinearFunctional::
-covariance(int j)
+covariance(int j) const
 {
    // see gpr-notes, equation (39), p34.
    GPR* gpr=getGPR();
    int N=gpr->get_N();
    // the sequence of values integral(gpr->psi_k)
-   const RealArray1D l=valuesOnBasisFunctions(gpr);
+   const RealArray1D l=valuesOnBasisFunctions();
    // the matrix psi_k(s_j)
-   const RealMatrix& gpr->get_psi();
+   const RealMatrix& psi=gpr->get_psi();
    Real cv=0.0;
    for(int k=0;k<=N;k++) cv+=psi(k,j)*l[k];
    return cv;
@@ -58,11 +79,15 @@ covariance(int j)
 //------------------INTEGRAL-------------------------------
 
 
-
-
-const RealArray1D
 Integral::
-valuesOnBasisFunctions()
+Integral(GPR& gp):
+LinearFunctional(gp)
+{  }
+
+
+RealArray1D
+Integral::
+valuesOnBasisFunctions() const
 {
    GPR* gpr=getGPR();
    int N=gpr->get_N();
@@ -73,15 +98,23 @@ valuesOnBasisFunctions()
 //------------------EVALUATION FUNCTIONAL--------------------------
 
 
-
-
-
-const RealArray1D
 EvaluationFunctional::
-valuesOnBasisFunctions()
+EvaluationFunctional(GPR& gp, Real s):
+LinearFunctional(gp),
+t(s)
+{ assert((s<=1.0)&&(-1.0<=s)); }
+
+
+
+RealArray1D
+EvaluationFunctional::
+valuesOnBasisFunctions() const
 {
    GPR* gpr=getGPR();
    int N=gpr->get_N();
    return gpr->getBasisFunctions()->values(t,N);
 }
 
+
+
+GPR_END_NAMESPACE(Gaussian)

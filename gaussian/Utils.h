@@ -20,8 +20,8 @@ spyqqqdia@yahoo.com
 
 */
 
-#ifndef martingale_utils_h
-#define martingale_utils_h
+#ifndef gpr_utils_h
+#define gpr_utils_h
 
 
 #include <string>
@@ -31,7 +31,7 @@ spyqqqdia@yahoo.com
 using std::string;
 
 
-MTGL_BEGIN_NAMESPACE(Martingale)
+GPR_BEGIN_NAMESPACE(Gaussian)
 
 /** separation between program outputs on the console.
  */
@@ -163,6 +163,6 @@ void consoleReport(int n, int N);
 
 
            
-MTGL_END_NAMESPACE(Martingale)
+GPR_END_NAMESPACE(Gaussian)
 
 #endif

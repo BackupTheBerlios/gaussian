@@ -19,8 +19,8 @@
  #include "Matrix.h"
  #include <string>
  using std::string;
- using namespace Martingale;
 
+GPR_BEGIN_NAMESPACE(Gaussian)
  
 /** Basis functions on [-1,+1]. Usually orthonormal in \f$L^2([-1,+1], dt)\f$.
  *  Note that we are using <i>normalized</i> Lebesgue measure \f$d\mu=(1/2)dt\f$
@@ -33,13 +33,13 @@ public:
    /** Computes the sequence \f$(\psi_0(x),\dots,\psi_m(x))\f$ of values of the
     *  basis functions.
     **/
-   virtual RealArray1D values(Real x, int m)=0;
+   virtual RealArray1D values(Real x, int m) const=0;
 
    /** Multiplier \f$\rho\in(0,1]\f$ used in {@link GPR::polluteAndPredictCV()}.
     *  We move from \f$f_{q-1}\f$ to \f$f_q\f$ only if error drops of by factor
     *  \f$\rho\f$.
     **/
-   virtual Real roughnessPenalty(int q){ return 1.0; }
+   virtual Real roughnessPenalty(int q) const { return 1.0; }
    
    /** Designation of basis.
     **/
@@ -52,12 +52,12 @@ public:
    /** Tight lower bound for the first q basis functions.
     *  Used only in drawing graphs of the basis functions.
     */
-   virtual Real ymin(int q)=0;
+   virtual Real ymin(int q) const=0;
 
    /** Tight upper bound for the first q basis functions.
     *  Used only in drawing graphs of the basis functions.
     */
-   virtual Real ymax(int q)=0;   
+   virtual Real ymax(int q) const=0;   
 
    /** Print an EPS graph of the first q basis functions. **/
    void print(int q);
@@ -65,7 +65,7 @@ public:
    /** The sequence of integrals
     *  \f$I_k=\int_{-1}^{+1}\psi_k(t)dt,\ k\leq N.\f$
     */
-   virtual const RealArray1D integrals(int N);
+   virtual RealArray1D integrals(int N) const;
 
 };
 
@@ -75,12 +75,12 @@ class LegendreBasis : public BasisFunctions {
 
 public:
 
-   RealArray1D values(Real x, int m);
-   Real roughnessPenalty(int q);
+   RealArray1D values(Real x, int m) const;
+   Real roughnessPenalty(int q) const;
    string name() const { return "Legendre_basis"; }
-   Real ymin(int q){ return -5.0; }
-   Real ymax(int q){ return 5.0; }
-   const RealArray1D integrals(int N);
+   Real ymin(int q) const { return -5.0; }
+   Real ymax(int q) const { return 5.0; }
+   RealArray1D integrals(int N) const;
 };
 
 
@@ -89,10 +89,13 @@ class FourierBasis : public BasisFunctions {
 
 public:
 
-   RealArray1D values(Real x, int m);
-   Real roughnessPenalty(int q);
+   RealArray1D values(Real x, int m) const;
+   Real roughnessPenalty(int q) const;
    string name() const { return "Fourier_basis"; }
-   Real ymin(int q){ return -2.2; }
-   Real ymax(int q){ return 2.2; }
-   const RealArray1D integrals(int N);
+   Real ymin(int q) const { return -2.2; }
+   Real ymax(int q) const { return 2.2; }
+   RealArray1D integrals(int N) const;
 };
+
+
+GPR_END_NAMESPACE(Gaussian)

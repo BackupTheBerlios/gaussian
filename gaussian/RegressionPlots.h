@@ -15,10 +15,13 @@
  *                                                                         *
  ***************************************************************************/
 
-
+#ifndef gpr_regressionplots_h
+#define gpr_regressionplots_h
 
 #include "gpr.h"
 
+
+GPR_BEGIN_NAMESPACE(Gaussian)
 
 
 /** Draws plots of regressions. */
@@ -63,3 +66,7 @@ private:
 };
 
 
+GPR_END_NAMESPACE(Gaussian)
+
+
+#endif

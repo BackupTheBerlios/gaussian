@@ -15,8 +15,10 @@
 #include "BasisFunctions.h"
 #include "FunctionExamples.h"
 #include <string>
-using namespace Martingale;
 using std::string;
+
+
+GPR_BEGIN_NAMESPACE(Gaussian)
 
 
 class Functional;
@@ -33,10 +35,10 @@ public:
    enum RegressionType {EMPIRICAL, GAUSSIAN};
 
    /** Maximal expansion length: \f$\psi_0,\psi_1,\dots,\psi_N\f$. */
-   int get_N(){ return N; }
+   int get_N() const { return N; }
 
    /** Parameter n = number of data points - 1. */
-   int get_n(){ return n; }
+   int get_n() const { return n; }
 
    /** The points \f$s_j\f$. */ 
    const RealArray1D& get_s() const { return s; }
@@ -92,7 +94,7 @@ public:
    void setPriorMeanToEmpiricalCoefficients();
 
    /** Set the basis functions (must recompute all data structures).*/
-   const BasisFunctions* getBasisFunctions(){ return basis; };
+   const BasisFunctions* getBasisFunctions() const { return basis; };
 
    /** Set the basis functions (must recompute all data structures).*/
    void setBasisFunctions(BasisFunctions* bFcns);
@@ -321,7 +323,7 @@ private:
 
 
 
-
+GPR_END_NAMESPACE(Gaussian)
 
  
 

@@ -24,7 +24,7 @@ spyqqqdia@yahoo.com
 #include "Utils.h"
 using std::cout;
 
-MTGL_BEGIN_NAMESPACE(Martingale)
+GPR_BEGIN_NAMESPACE(Gaussian)
 
 
 void 
@@ -122,6 +122,6 @@ void LoopStatus::consoleReport(int n, int N)
 
 
 
-MTGL_END_NAMESPACE(Martingale)
+GPR_END_NAMESPACE(Gaussian)
 
 

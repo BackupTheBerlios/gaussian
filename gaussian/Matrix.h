@@ -40,7 +40,7 @@ spyqqqdia@yahoo.com
  * Created on February 19, 2003, 6:00 PM
  */
 
-MTGL_BEGIN_NAMESPACE(Martingale)
+GPR_BEGIN_NAMESPACE(Gaussian)
 
 
 
@@ -1511,6 +1511,6 @@ public:
 
 
 
-MTGL_END_NAMESPACE(Martingale)
+GPR_END_NAMESPACE(Gaussian)
 
 #endif

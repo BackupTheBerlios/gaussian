@@ -17,10 +17,10 @@
 
 #include "Array.h"
 
-MTGL_BEGIN_NAMESPACE(Martingale)
+GPR_BEGIN_NAMESPACE(Gaussian)
 
 ostream&
 operator << (ostream& os, const RealArray1D& y)
 { y.printSelf(os); }
 
-MTGL_END_NAMESPACE(Martingale)
+GPR_END_NAMESPACE(Gaussian)

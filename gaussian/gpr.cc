@@ -18,9 +18,9 @@ using std::ofstream;
 using std::system;
 using std::setprecision;
 using std::sqrt;
-using namespace Martingale;
 
 
+GPR_BEGIN_NAMESPACE(Gaussian)
 
 
 
@@ -289,11 +289,11 @@ estimateFunctional(const Functional& L)
 
 Real
 GPR::
-estimateFunctional(const LinearFunctional& L)
+estimateLinearFunctional(const LinearFunctional& L)
 {
-   const RealArray1D d=getCoefficients();
+   RealArray1D d=getCoefficients();
    // the sequence of values L(psi_k), k<=N.
-   const RealArray1D l=L.valuesOnBasisFunctions();
+   RealArray1D l=L.valuesOnBasisFunctions();
    // use regressor f_N to preserve equality with general
    // functional estimation, gpr-notes, equation (40), p34.
    // Recall: L(this,N)[k]=L(psi_k), k<=N.
@@ -844,6 +844,11 @@ computePollutedCoefficients()
    return ap;
 }
 
+
+
+
+
+GPR_END_NAMESPACE(Gaussian)
 
 
 

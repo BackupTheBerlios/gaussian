@@ -20,14 +20,19 @@
 #endif
 
 #include "Programs.h"
+#include "gpr.h"
 #include <cstdlib>
+
+using namespace Gaussian;
 
 int main(int argc, char *argv[])
 {
   //interactiveRegression();
   //GPR::printBasisFunctions(9);
-  regressionPlots();
+  //regressionPlots();
   //plotTest();
+  //choleskyTiming();
+  functionalEstimationTest();
 
   return EXIT_SUCCESS;
 }

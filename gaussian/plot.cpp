@@ -11,6 +11,10 @@ using std::min;
 using std::max;
 
 
+GPR_BEGIN_NAMESPACE(Gaussian)
+
+
+
 
 const char*
 PSPlot::
@@ -157,7 +161,7 @@ drawMarker(Real x, Real y)
 
 
 
-
+GPR_END_NAMESPACE(Gaussian)
 
    
       

@@ -20,8 +20,8 @@ spyqqqdia@yahoo.com
 
 */
 
-#ifndef martingale_typedefsmacros_h
-#define martingale_typedefsmacros_h
+#ifndef gpr_typedefsmacros_h
+#define gpr_typedefsmacros_h
 
 #include <cassert>
 #include <iostream>                         // once and for all
@@ -31,8 +31,8 @@ using std::cin;
 using std::endl;
 
 
-#define MTGL_BEGIN_NAMESPACE(name) namespace name {
-#define MTGL_END_NAMESPACE(name) }
+#define GPR_BEGIN_NAMESPACE(name) namespace name {
+#define GPR_END_NAMESPACE(name) }
 
 
 
@@ -44,8 +44,9 @@ using std::endl;
 #define SQRT_TWO 1.414213562373095049
 
 #define GR 0.6180339887    // golden ratio, 1/GR=1+GR
-
-#define SMALL 30
+#define SMALL 30           // small matrix, uses cache for multiplication
+#define SIGMA 0.01         // what we add to the diagonal of the kernel matrix
+                           // (K(s_i,s_j)) to ensure positive definiteness
 
 // the basic scalar type
 typedef double Real;

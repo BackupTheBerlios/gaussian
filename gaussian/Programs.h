@@ -15,8 +15,12 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "TypedefsMacros.h"
+ 
+GPR_BEGIN_NAMESPACE(Gaussian)
 
 void plotTest();
+void choleskyTiming();
 
 /** Writes the data files "ExpansionData.txt" and "FunctionData.txt"
  *  for plotting the regressors \f$f_0,f_1,\dots,f_N\f$ of the function \f$f(t)\f$
@@ -45,3 +49,15 @@ void interactiveRegression();
  *  Plots are the directory "expansion".
  */
 void regressionPlots();
+
+
+/** Estimates the integral and evaluation functional at t=0.5 for each of the
+ *  function examples. The functionals are viewed both as linear functionals
+ *  and general nonlinear functionals and the computation cartried out for both
+ *  cases.
+ */
+void functionalEstimationTest();
+ 
+
+
+GPR_END_NAMESPACE(Gaussian)

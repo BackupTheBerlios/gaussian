@@ -27,11 +27,10 @@
 #include "Utils.h"
 using std::ofstream;
 using std::system;
-using namespace Martingale;
 
 
 
-
+GPR_BEGIN_NAMESPACE(Gaussian)
 
 
 
@@ -202,5 +201,5 @@ regressionPlots()
 
 
 
-
+GPR_END_NAMESPACE(Gaussian)
 

@@ -22,6 +22,8 @@
 using std::sin;
 using std::cos;
 
+GPR_BEGIN_NAMESPACE(Gaussian)
+
 
 void
 BasisFunctions::
@@ -44,9 +46,9 @@ print(int q)
 
 
 
-const RealArray1D
+RealArray1D
 BasisFunctions::
-integrals(int N)
+integrals(int N) const
 {
    cerr << "BasisFunctions: integrals not implemented current basis. Exiting.";
    exit(EXIT_FAILURE);
@@ -61,7 +63,7 @@ integrals(int N)
 
 RealArray1D
 LegendreBasis::
-values(Real x, int m)
+values(Real x, int m) const
 {
 	RealArray1D P(m+1);
 	int r;
@@ -80,15 +82,15 @@ values(Real x, int m)
 
 Real
 LegendreBasis::
-roughnessPenalty(int q)
+roughnessPenalty(int q) const
 {
    return exp(-(q/5)*0.3);
 }
 
 
-const RealArray1D
+RealArray1D
 LegendreBasis::
-integrals(int N)
+integrals(int N) const
 {
    RealArray1D I(N+1);
    I[0]=2.0;    // all other integrals are zero
@@ -103,7 +105,7 @@ integrals(int N)
 
 RealArray1D
 FourierBasis::
-values(Real x, int m)
+values(Real x, int m)  const
 {
    assert(m>=0);
    RealArray1D P(m+1);
@@ -118,15 +120,15 @@ values(Real x, int m)
 
 Real
 FourierBasis::
-roughnessPenalty(int q)
+roughnessPenalty(int q) const
 {
    return exp(-(q/5)*0.3);
 }
 
 
-const RealArray1D
+RealArray1D
 FourierBasis::
-integrals(int N)
+integrals(int N) const
 {
    RealArray1D I(N+1);
    I[0]=2.0;    // all other integrals are zero
@@ -134,5 +136,5 @@ integrals(int N)
 }
 
 
-
+GPR_END_NAMESPACE(Gaussian)
 

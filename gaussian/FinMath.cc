@@ -27,8 +27,7 @@ spyqqqdia@yahoo.com
 #include <iostream>
 
 
-MTGL_BEGIN_NAMESPACE(Martingale)
-
+GPR_BEGIN_NAMESPACE(Gaussian)
     
  
  
@@ -257,4 +256,4 @@ blackImpliedAggregateCallVolatility(Real Q, Real k, Real y)
 
 
 
-MTGL_END_NAMESPACE(Martingale)
+GPR_END_NAMESPACE(Gaussian)

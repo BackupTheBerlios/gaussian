@@ -29,7 +29,9 @@ using std::sin;
 using std::exp;
 using std::log;
 using std::abs;
-using namespace Martingale;
+
+
+GPR_BEGIN_NAMESPACE(Gaussian)
 
 
 
@@ -49,13 +51,21 @@ f3(Real t){ return 5*t*exp(-9*t*t/2)+t*t*sin(11*PI*t); }
 Real
 f4(Real t){ return 1.6*abs(t)*sin(11*PI*t); }
 
+Real
+f5(Real t){ return t*t*(1+t); }
+
 
 RealFunction
 functionExample(int j)
 {
-   assert((0<=j)&&(j<=4));
-   RealFunction f[5]={&f0,&f1,&f2,&f3,&f4};
+   assert((0<=j)&&(j<=5));
+   RealFunction f[6]={&f0,&f1,&f2,&f3,&f4,&f5};
    return f[j];
 }
+
+
+
+GPR_END_NAMESPACE(Gaussian)
+
 
 

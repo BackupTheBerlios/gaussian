@@ -25,7 +25,10 @@
 #include <fstream>
 #include "Array.h"
 using std::ofstream;
-using namespace Martingale;
+
+
+
+GPR_BEGIN_NAMESPACE(Gaussian)
 
 
 /** A postscript plotter. **/
@@ -96,6 +99,8 @@ public:
 
 }; 
 
+
+GPR_END_NAMESPACE(Gaussian)
 
 
 #endif

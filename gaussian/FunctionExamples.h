@@ -20,7 +20,9 @@
 
 #include "TypedefsMacros.h"
 #include "Array.h"
-using namespace Martingale;
+
+
+GPR_BEGIN_NAMESPACE(Gaussian)
 
 
 
@@ -44,8 +46,14 @@ Real f3(Real t);
  **/
 Real f4(Real t);
 
+/** \f$f(t)=t^2+t^3\f$ */
+Real f5(Real t);
+
 /** The j-th function exmple. */
 RealFunction functionExample(int j);
+
+
+GPR_END_NAMESPACE(Gaussian)
 
 
 #endif

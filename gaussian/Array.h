@@ -31,7 +31,7 @@ spyqqqdia@yahoo.com
 using std::ostream;
 using std::string;
 
-MTGL_BEGIN_NAMESPACE(Martingale)
+GPR_BEGIN_NAMESPACE(Gaussian)
 
 
 /*! \file Array.h
@@ -197,7 +197,7 @@ public:
 	explicit Array1D(int n_, int b_=0) : 
 	b(b_), n(n_) 
 	{  
-         dptr=new S[n];
+     dptr=new S[n];
 		 for(int i=0;i<n;i++) dptr[i]=0;
 	} 
 	
@@ -206,7 +206,7 @@ public:
 	b(x.getIndexBase()), 
 	n(x.getDimension()) 
 	{  
-         dptr=new S[n];
+     dptr=new S[n];
 		 S* xdptr=x.getData();
 		 for(int i=0;i<n;i++) dptr[i]=xdptr[i];
 	} 
@@ -565,135 +565,6 @@ typedef Array2D<unsigned long> UnsignedLongArray2D;
 
 
 
-
-/**********************************************************************************
- *
- *         LIBOR  ARRAY
- *
- *********************************************************************************/
-
-
-/** <p>Array in dimension 2 to contain Libors under the assumption that nSteps time 
- *  steps are taken in each accrual interval. For each accrual interval \f$[T_t,T_{t+1}]\f$
- *  the array has block of nSteps rows of length n-t-1 (the number of Libors still alive
- *  in this time interval), one row for each time step. Each such row has column index
- *  base t+1.
- *
- * <p>In other words: during time step s we are in row r[s][] with t=s/nStep and elements
- * in this row are subscripted as r(s,j), j=t+1,...,n-1 corresponding to the indices of the
- * surviving Libors.
- *
- * @param S type of array elements.
- */
-template<typename S>
-class LiborArray2D {
-	
-protected:
-	
-	/** Dimension of the Libor process. */
-	int n;  
-	
-	/** Number of time steps of the underlying Libor process in 
-	 *  each Libor accrual interval.
-	 */
-	int nSteps;   
-				
-	/** Data array. */
-	S** dptr;
-
-	
-public:
-	
-
-	
-// CONSTRUCTOR
-	
-	/** @param dim dimension of underlying Libor process (number n of accrual intervals).
-	 *  @param steps number of time step in each accrual interval.
-	 */
-	LiborArray2D(int dim, int steps) : 
-	n(dim), nSteps(steps)
-	{  
-         dptr=new S*[n*nSteps];
-		 for(int t=0;t<n-1;t++)
-		 for(int u=0;u<nSteps;u++){
-			 
-		    int s=t*nSteps+u;             // number of time step	 
-		    dptr[s]=new S[n-t-1];
-			for(int j=0;j<n-t-1;j++)dptr[s][j]=0;
-		 }
-	} // end constructor
-
-	
-	~LiborArray2D()
-    {
-		 for(int t=0;t<n-1;t++)
-		 for(int u=0;u<nSteps;u++) delete[] dptr[t*nSteps+u];
-		 delete[] dptr;
-	}
-	
-   /** Subscripting.
-    */
-   const S& operator()(int s, int j) const 
-   { 
-	   #ifdef SUBSCRIPT_CHECK
-	      checkSubscripts(s,j);
-	   #endif	
-	   return dptr[s][j-1-s/nSteps]; 
-   }
-   
-   /** Subscripting.
-    */
-   S& operator()(int s, int j) 
-   { 
-	   #ifdef SUBSCRIPT_CHECK
-	      checkSubscripts(s,j);
-	   #endif	
-	   return dptr[s][j-1-s/nSteps]; 
-   }
-   
-private:
-   
-   // time step s lands in the accrual interval (T_{t-1},T_t].
-   int get_t(int s)
-   {
-	   if(s%nSteps==0) return s/nSteps;
-	   return s/nSteps+1;
-   }
-   
-   void checkSubscripts(int s, int j)
-   {
-	   if((s<0)||(s>n*nSteps-1)){
-		   
-		   cout << "\n\nLiborArray2D: time step s = " << s 
-		        << " not in [0," << n*nSteps-1 << "]"
-		        << "\nTerminating.";
-		   exit(0);
-	   }
-	   
-	   int t=get_t(s);
-	   if((j<t)||(j>n-1)){
-		   
-		   cout << "\n\nLiborArray2D: time step s = " << s << ", t = " << t
-		   
-		        << "\nLibor index j = " << j << " not in ["<<t<<","<<n-1<<"]"
-		        << "\nTerminating.";
-		   exit(0);
-	   }
-   } // end checkSubscript
-		   
-				
-
-}; // end LiborArray2D
-
-
-
-
-	
-	
-
-
-
-MTGL_END_NAMESPACE(Martingale)
+GPR_END_NAMESPACE(Gaussian)
 
 #endif

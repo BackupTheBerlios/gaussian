@@ -5,8 +5,8 @@
 
 
 
-MTGL_BEGIN_NAMESPACE(Martingale)
-MTGL_BEGIN_NAMESPACE(Random)
+GPR_BEGIN_NAMESPACE(Gaussian)
+GPR_BEGIN_NAMESPACE(Random)
 
 
 // static initialization
@@ -170,5 +170,5 @@ sTN(){ return nInverse(U01()); }
 
 
 
-MTGL_END_NAMESPACE(Random)
-MTGL_END_NAMESPACE(Martingale)
+GPR_END_NAMESPACE(Random)
+GPR_END_NAMESPACE(Gaussian)
