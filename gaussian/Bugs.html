@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title></title>
+</head>
+<body>
+
+<h1>Bugs</h1>
+
+<h3>6-16-04</h3>
+
+<h5>Fourier basis</h5> 
+
+This basis does not work at all. Not even with empirical coefficients computed from a very
+large number of data points. Why not???
+Printing shows the basis functions are OK.
+<p>
+Note: the Fourier basis is an example where the kernel matrix (K(s_i,s_j))_{0<=i,j<=n can fail
+to be positive semidefinite even though N>=n.
+This happens in particular if the s_j form an equidistant partition of [-1,+1].
+For N=n the kernel matrix is integer valued. Find out why.
+<p>
+Clearly equidistant points are not good.
+Use random points instead.
+To no avail the Fourier basis NEVER WORKS.
+<p>
+The Legendre basis does work flawlessly on smooth functions but has problems with nonsomooth functions.
+See expansions/Abs and expansion/f_3.
+Note in particular how detrimental it is to include the data point t=0 at the corner.
+The problems persist even under NOISY data.
+Somehow the basis KNOWS that the underlying function is not smooth despite the noise in
+the data.
+
+<h5>Matrix.h</h5>
+<p>
+<code>Matrix& operator =(const Matrix& B){ if(this=&B) return *this; .......}</code>
+<p>
+There should be two equality signs.  This is not yet fixed in <code>martingale</code>.
+Post the bug on the project website.
+
+
+<h3>6-17-04</h3>
+
+Empirical regression with Fourier basis with very large numer of data points shows systematic error.
+See file results/Fourier-601-emp.eps (empirical with 601 data points).
+Check normalization.
+
+<code>Programs.h: interactiveRegression()</code> works.
+<code>Programs.h: regressionPlots():</code> does not work, directories not allocated correctly, plots akward.
+<code>Programs.h: plotTest():</code> works.
+
+
+<h3>6-18-04</h3>
+
+<code>RegressionPlots::regressionPlots():</code> works but cannot be used on Fourier basis as N is set to N=1.6*n 
+and this is not enough to make the kernel matrix positive definite in each case. As the program exits
+from the Cholesky decomposition the plots are not saved.
+Implement choice to set N=k*n, with k chosen by user.
+<p>
+<code>Plot.h: PSPlot</code> Implement a method that allows us to plot the data points.
+
+
+
+
+
+
+</body>
+</html>

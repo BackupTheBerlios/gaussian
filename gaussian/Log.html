@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title></title>
+</head>
+<body>
+
+<h1>gpr: Log</h1>
+
+<h3>6-17-04</h3>
+
+Massive reorganization from 6-16-04.
+<p>
+<code>GPR::</code>
+Implemented ability to skip initialization of Gaussian data structures 
+(for empirical regression with very many data points).
+Replaced <code>void expansionDialog(...)</code> with <code>GPR& setUP(void).</code>
+<br>
+Added constructor takes known function<code> f</code> generating the data instead of data array <code>y</code>.
+For experimentation. Streamlines the <code>GPR:: setUP()</code> procedure.
+<p>
+<code>RegressionPlots::</code> new class, takes over plotting.
+<p>
+<code>Programs.h</code>: new file, contains the free standing programs.
+
+
+<h3>6-18-04</h3>
+
+Fixed up <code>RegressionPlots::regressionPlots()</code>. Now works, allocates directories and copies files
+correctly. Many new get/set functions in <code>GPR</code>. Objects can now be fully reconfigured after construction.
+
+</body>
+</html>
