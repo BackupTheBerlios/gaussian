@@ -77,5 +77,19 @@ coefficient vectors after artificial data pollution. Hand these as parameters to
 <p>
 Do some experiments with relative noise instead of absolute noise in the data.
 
+
+
+<h3>6-30-04</h3>
+
+<code>GPR::polluteAndPredictCV()</code> optimized.
+All necessary data structures added to class (polluted data and coefficient arrays).
+Now the basis matrix and Cholesky root are no longer recomputed.<br>
+Roughness penalty for exact data eliminated.<br>
+Noisy data: still needs experimentation: should we average the error over the added noise? 
+Should the added noise have larger standard deviation than the inherent noise in the data?
+Is the roughness penalty in the various bases too high?
+See performance on f2 in the Fourier basis.
+
+
 </body>
 </html>
