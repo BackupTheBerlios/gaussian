@@ -168,5 +168,60 @@ functionalEstimationTest()
 
 
 
+void
+writeIntegrals(ofstream& os, GPR* gpr)
+{
+   os << gpr->getBasisFunctions()->name() << endl << endl
+      << "Function     Monte Carlo    Bayesian Monte Carlo    Exact integral"
+      << endl << endl;
+   for(int l=0;l<N_FUNC;l++){
+
+      RealFunction f=functionExample(l);
+      gpr->setFunction(f);
+      Integral I(gpr);
+      Real Simpson=integral(-1.0,1.0,f),
+           MC=gpr->monteCarloIntegral(),
+           BMC=gpr->estimateLinearFunctional(I);
+
+      os << "  f" << l << "      " << MC << "        " << BMC
+         << "          " << Simpson << endl;
+   }
+   os << endl << endl;
+}
+
+
+
+void
+bayesMonteCarlo(Real sigma)
+{
+   cout << "Computing Bayesian Monte Carlo intergrals" << endl
+        << "for all function examples in all bases:" << endl
+        << "how many data points? n=";
+   int n; cin >> n;
+      // data points t
+   int N=n;
+   RealArray1D t=GPR::dataPoints(n,false);
+   ofstream fout("Integrals.txt");
+   fout << "Data points:" << endl << t << endl << endl;
+   
+   BasisFunctions* bFcns=new LegendreBasis();
+   RealFunction f=functionExample(0);
+   GPR* gpr=new GPR(N,t,f,bFcns,sigma,GPR::GAUSSIAN);
+   gpr->conditioning();
+
+   writeIntegrals(fout,gpr);
+
+   bFcns=new FourierBasis();
+   gpr->setBasisFunctions(bFcns);
+
+   writeIntegrals(fout,gpr);
+
+   fout.close();
+
+   cout << endl << "Done, data in file Integrals.txt.";
+}
+
+
+
 
 GPR_END_NAMESPACE(Gaussian)

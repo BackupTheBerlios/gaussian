@@ -73,7 +73,7 @@ public:
    bool haveGaussian() const { return have_gaussian; }
 
    /** The mean of the Gaussian prior P encoded as the vector
-    *  \f$\mu_k=E{A_k]\f, k\leq N,\f$ of the unconditional 
+    *  \f$\mu_k=E[A_k], k\leq N,\f$ of the unconditional 
     *  expectations of the coefficient functionals.
     */
    const RealArray1D& getPriorMean() const { return mu; }
@@ -108,7 +108,7 @@ public:
    void setFunction(RealFunction g);
 
    /** Adds independent gaussian noise of standard deviation sigma
-    *  to the function data. (recomputes all coefficients).
+    *  to the function data (recomputes all coefficients).
     */
    void addNoise(Real sigma);
 
@@ -152,7 +152,20 @@ public:
    GPR(int M, int m, RealFunction g, BasisFunctions* bFcns, bool random);
 
 
+//--------------------SETUP-------------------------------------------------
 
+
+   /** Sets up a Gaussian process regressor {@link GPR} with function examples
+    *  via a dialogue with the user. User must delete the GPR object.
+    */
+   static GPR& setUp();
+
+   /** Array of points \f$t_j\in[-1,+1],\ 0\leq j\leq m\f$ with
+    *  \f$t_0=-1,\ t_m=+1\f$.
+    *  Points are in increasing order and equidistant or uniformly random.
+    *  Use: setup of a GPR object.
+    */
+   static RealArray1D dataPoints(int m, bool random=false);
 
 
 //--------------------EXPANSIONS--------------------------------------------
@@ -164,34 +177,30 @@ public:
    RealArray1D basisFunctionValues(Real t, int m)
    { return basis->values(t,m); }
 
-   /** Sets up a Gaussian process regressor {@link GPR} with function examples
-    *  via a dialogue with the user. User must delete the GPR object.
-    */
-   static GPR& setUp();	
 
 	/** The expansion \f$f_q(t)\f$ using Gaussian or empirical coefficients \f$a_k\f$
 	 *  depending on the current state of <code>this</code>.
 	 **/
 	Real expansion(Real t, int q);
 
-   /** Writes data files for the expansions expansions \f$f_0,f_1,\dots,f_q\f$ of
-	 *  f in Legendre polynomials on [-1,+1] with coefficients computed by
-	 *  Gaussian regression for potting with gnuplot.
-	 *
-	 *  The expansions are evaluated at 801 evenly spaced points \f$t_j\in[-1+1]\f$
-	 *  and written to a file "ExpansionData.txt" in gnuplot data format.
-    *  The first column contains the points \f$t_j\f$, the next column the true
-	 *  function values \f$f(t_j)\f$ (if the function f generating the data is known
-    *  otherwise skipped) and the subsequent columns the expansions
-	 *  \f$f_0(t_j),f_1(t_j),\dots,f_q(t_j)\f$.
-	 *
-	 *  See "doc/gnuplot_Readme.html" for instructions how to plot such data
-	 *  with gnuplot.
-	 *
-    *  The data points are written to the file "FunctionData.txt". The first column
-	 *  contains the points \f$s_j\f$ and the second column the data points \f$y_j\f$.
-	 *
-    **/
+  /** Writes data files for the expansions expansions \f$f_0,f_1,\dots,f_q\f$
+   *   of f in Legendre polynomials on [-1,+1] with coefficients computed by
+   *  Gaussian regression for potting with gnuplot.
+   *
+   *  The expansions are evaluated at 801 evenly spaced points \f$t_j\in[-1+1]\f$
+   *  and written to a file "ExpansionData.txt" in gnuplot data format.
+   *  The first column contains the points \f$t_j\f$, the next column the true
+   *  function values \f$f(t_j)\f$ (if the function f generating the data is known
+   *  otherwise skipped) and the subsequent columns the expansions
+   *  \f$f_0(t_j),f_1(t_j),\dots,f_q(t_j)\f$.
+   *
+   *  See "doc/gnuplot_Readme.html" for instructions how to plot such data
+   *  with gnuplot.
+   *
+   *  The data points are written to the file "FunctionData.txt". The first column
+   *  contains the points \f$s_j\f$ and the second column the data points \f$y_j\f$.
+   *
+   **/
    void expansionData(int q);
 
 
@@ -216,24 +225,24 @@ public:
 //------------------FUNCTIONAL ESTIMATION----------------------------
 
 
-    /** Estimate the value \f$E[\ths L\ths|\ths data\ths]\f$ as in
-     *  gpr-notes, section 6 (pp. 33-35). L has to be based on the
+    /** Estimate the value \f$E[\thinspace L\thinspace|\thinspace data\thinspace]\f$ 
+     *  as in gpr-notes, section 6 (pp. 33-35). L has to be based on the
      *  GPR <code>this</code> (L-constructor).
      *
-     *  @returns \f$E[\ths L\ths|\ths data\ths]\f$.
+     *  @returns \f$E[\thinspace L\thinspace|\thinspace data\thinspace]\f$.
      */
     Real estimateFunctional(Functional& L);
 
 
-    /** Estimate the value \f$E[\ths L\ths|\ths data\ths]\f$ as in
-     *  gpr-notes, section 6, equation (40), p. 34. This assumes that the
-     *  coefficients \f$a_k=E[\ths A_k\ths|\ths data\ths]\f$ have already been
-     *  computed. L has to be based on the GPR <code>this</code> (L-constructor).
+    /** Estimate the value \f$E[\thinspace L\thinspace|\thinspace data\thinspace]\f$ 
+     *  as in gpr-notes, section 6, equation (40), p. 34. This assumes that the
+     *  coefficients \f$a_k=E[\thinspace A_k\thinspace|\thinspace data\thinspace]\f$ 
+     *  have already been computed. L has to be based on the GPR <code>this</code>.
      *
      *  Current implementation uses the regressor \f$f_N\f$. This is only
      *  useful with exact data.
      *
-     *  @returns \f$E[\ths L\ths|\ths data\ths]\f$.
+     *  @returns \f$E[\thinspace L\thinspace|\thinspace data\thinspace]\f$.
      */
     Real estimateLinearFunctional(LinearFunctional& L);
 
@@ -268,7 +277,7 @@ public:
 
    /** Tests the basis functions \f$\psi_0,\dots,\psi_q\f$ for orthonormality
     *  using Monte Carlo integration on m random points in [-1,+1].
-	 *  Prints the matrix of inner products \f$(\psi_i,\psi_j)\f$.
+    *  Prints the matrix of inner products \f$(\psi_i,\psi_j)\f$.
     **/
    void orthoTest(int q, int m);
 

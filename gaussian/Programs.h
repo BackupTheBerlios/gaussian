@@ -61,6 +61,16 @@ void regressionPlots();
  *  cases.
  */
 void functionalEstimationTest();
+
+
+/** Estimates the integral over [-1,+1] viewed as a linear functional
+ *  and compares the value to the Monte Carlo
+ *  integral using the data points and to the "exact" integral (Simpson's rule
+ *  using 10000 equidistant points). Output written to file "Integrals.txt".
+ *
+ *  @param sigma standard deviation of data noise
+ */
+void bayesMonteCarlo(Real sigma);
  
 
 

@@ -14,10 +14,14 @@
 #include "Random.h"
 #include "plot.h"
 #include <cmath>
+#include <vector>
+#include <algorithm>
 using std::ofstream;
 using std::system;
 using std::setprecision;
 using std::sqrt;
+using std::vector;
+using std::sort;
 
 
 GPR_BEGIN_NAMESPACE(Gaussian)
@@ -603,14 +607,36 @@ printBasisFunctions(int q)
 
 
 
-//-----------------USER SET UP---------------------------------
+//-----------------SET UP---------------------------------
 
+
+RealArray1D
+GPR::
+dataPoints(int m, bool random)
+{
+   Real h=2.0/m;
+   RealArray1D t(m+1);
+   for(int i=0;i<=m;i++) t[i]=-1.0+i*h;
+
+   if(random){
+
+        vector<Real> u(m+1);
+        u[0]=-1.0; u[m]=1.0;
+        for(int i=1;i<m;i++) u[i]=-1.0+2.0*Random::U01();
+        sort(u.begin(),u.end());
+        for(int i=0;i<=m;i++) t[i]=u[i];
+   }
+
+   return t;
+}
+
+
+       
 GPR&
 GPR::
 setUp()
 {
    int N,n;
-   RealArray1D t(1);
    Real sigma;
    RegressionType rType;
    BasisFunctions* bFcns;
@@ -644,18 +670,15 @@ setUp()
    cin>>N;
    cout << "Enter number n+1 of data points, n=";
    cin>>n;
-   t.resize(n+1);
 
-	int random;
-	cout << "Data points random (random=1) or evenly spaced (random=0), random=";
-	cin>>random;
+   int random;
+   cout << "Data points random (random=1) or evenly spaced (random=0), random=";
+   cin>>random;
 
-	// data abscissas s_j
-	if(random==0)
-	   for(int j=0;j<=n;j++) t[j]=-1.0+j*2.0/n;
-   else
-	   for(int j=0;j<=n;j++) t[j]=-1.0+2.0*Random::U01();
-
+   // data abscissas s_j
+   bool random_spacing=false;
+   if(random==1) random_spacing=true;
+   RealArray1D t=dataPoints(n,random_spacing);
 
    // BASIS
    cout << "Which basis:" << endl

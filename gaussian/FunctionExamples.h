@@ -24,21 +24,21 @@
 
 GPR_BEGIN_NAMESPACE(Gaussian)
 
-
+#define N_FUNC 6
 
 /** \f$f(t)=sin(2\pi t)\f$.
  **/
 Real f0(Real t);
 
-/** \f$f(t)=5t*exp(-9t^2/2)\f$.
+/** \f$f(t)=4*(1-t)*exp(-9t^2/2)\f$.
  **/
 Real f1(Real t);
 
-/** \f$f(t)=(1+t)cos(8\pi t)\f$.
+/** \f$f(t)=(1+t)/(1+t^2)\f$.
  **/
 Real f2(Real t);
 
-/** \f$f(t)=f1(t)+t^2sin(11\pi t)\f$.
+/** \f$f(t)=(1+t+t^2)/(2-t+t^2)\f$.
  **/
 Real f3(Real t);
 
@@ -46,11 +46,16 @@ Real f3(Real t);
  **/
 Real f4(Real t);
 
-/** \f$f(t)=t^2+t^3\f$ */
+/** \f$f(t)=t^2-exp(-t/2)\f$ */
 Real f5(Real t);
 
 /** The j-th function exmple. */
 RealFunction functionExample(int j);
+
+/** Numerical integral over [a,b] using Simpson's rule
+ *  on 10000 equidistant points.
+ */
+Real integral(Real a, Real b, RealFunction f);
 
 
 GPR_END_NAMESPACE(Gaussian)
