@@ -15,8 +15,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef FunctionExamples_h
-#define FunctionExamples_h
+#ifndef gpr_FunctionExamples_h
+#define gpr_FunctionExamples_h
 
 #include "TypedefsMacros.h"
 #include "Array.h"

@@ -108,6 +108,15 @@ and the Legendre basis. In the implementation of the methods for functional esti
 This precludes meaningful testing. Better: implement evaluation functionals and test the functional estimation methods on these.
 
 
+<h3>7-9-04</h3>
+
+Functional estimation compiles and works. Values for general and linear functionals agree in the linear case.
+<p>
+<b>To do:</b> switch from simple function pointers to function objects in the files <code>FunctionExamples.h,cpp</code>.
+Each function should be able to compute its true integral so we can compare performance of Bayesian versus ordinary
+Monte Carlo.
+
+
 
 </body>
 </html>

@@ -16,9 +16,13 @@
  ***************************************************************************/
 
 
- #include "Matrix.h"
- #include <string>
- using std::string;
+#ifndef gpr_basisfunctions_h
+#define gpr_basisfunctions_h
+
+ 
+#include "Matrix.h"
+#include <string>
+using std::string;
 
 GPR_BEGIN_NAMESPACE(Gaussian)
  
@@ -99,3 +103,5 @@ public:
 
 
 GPR_END_NAMESPACE(Gaussian)
+
+#endif

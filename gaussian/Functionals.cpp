@@ -23,35 +23,20 @@ GPR_BEGIN_NAMESPACE(Gaussian)
 
 
 
-
-//----------------FUNCTIONAL----------------------------
-
-Functional::
-Functional(GPR& gp):
-gpr(&gp)
-{  }
-
-
-
 //----------------LINEAR FUNCTIONAL----------------------------
 
-
-LinearFunctional::
-LinearFunctional(GPR& gp) :
-Functional(gp)
-{  }
 
 
 Real
 LinearFunctional::
-mean() const
+mean()
 {
    GPR* gpr=getGPR();
    int N=gpr->get_N();
    // the vector of unconditional expectations E[A_k]:
    const RealArray1D& mu=gpr->getPriorMean();
    // the sequence of values integral(gpr->psi_k)
-   const RealArray1D l=valuesOnBasisFunctions();
+   RealArray1D l=valuesOnBasisFunctions();
    Real I=0.0;
    for(int k=0;k<=N;k++) I+=mu[k]*l[k];
    return I;
@@ -60,13 +45,13 @@ mean() const
 
 Real
 LinearFunctional::
-covariance(int j) const
+covariance(int j)
 {
    // see gpr-notes, equation (39), p34.
    GPR* gpr=getGPR();
    int N=gpr->get_N();
    // the sequence of values integral(gpr->psi_k)
-   const RealArray1D l=valuesOnBasisFunctions();
+   RealArray1D l=valuesOnBasisFunctions();
    // the matrix psi_k(s_j)
    const RealMatrix& psi=gpr->get_psi();
    Real cv=0.0;
@@ -80,14 +65,14 @@ covariance(int j) const
 
 
 Integral::
-Integral(GPR& gp):
+Integral(GPR* gp) :
 LinearFunctional(gp)
 {  }
 
 
 RealArray1D
 Integral::
-valuesOnBasisFunctions() const
+valuesOnBasisFunctions()
 {
    GPR* gpr=getGPR();
    int N=gpr->get_N();
@@ -99,16 +84,15 @@ valuesOnBasisFunctions() const
 
 
 EvaluationFunctional::
-EvaluationFunctional(GPR& gp, Real s):
+EvaluationFunctional(GPR* gp, Real s) :
 LinearFunctional(gp),
 t(s)
 { assert((s<=1.0)&&(-1.0<=s)); }
 
 
-
 RealArray1D
 EvaluationFunctional::
-valuesOnBasisFunctions() const
+valuesOnBasisFunctions()
 {
    GPR* gpr=getGPR();
    int N=gpr->get_N();

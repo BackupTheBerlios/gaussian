@@ -7,8 +7,8 @@
  ****************************************************************************/
 
 
-#ifndef gpr_h
-#define gpr_h
+#ifndef gpr_gpr_h
+#define gpr_gpr_h
 
 
 #include "Matrix.h"
@@ -222,7 +222,7 @@ public:
      *
      *  @returns \f$E[\ths L\ths|\ths data\ths]\f$.
      */
-    Real estimateFunctional(const Functional& L);
+    Real estimateFunctional(Functional& L);
 
 
     /** Estimate the value \f$E[\ths L\ths|\ths data\ths]\f$ as in
@@ -235,7 +235,14 @@ public:
      *
      *  @returns \f$E[\ths L\ths|\ths data\ths]\f$.
      */
-    Real estimateLinearFunctional(const LinearFunctional& L);
+    Real estimateLinearFunctional(LinearFunctional& L);
+
+
+    /** Monte Carlo integral over [-1,+1] of the underlying function f computed 
+     *  from the function data. Use this to compare performance with Bayesian
+     *  Monte Carlo.
+     */
+    Real monteCarloIntegral();
 
    
 

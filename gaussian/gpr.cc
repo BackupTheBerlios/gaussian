@@ -241,7 +241,7 @@ bp(M+1)
 
 Real
 GPR::
-estimateFunctional(const Functional& L)
+estimateFunctional(Functional& L)
 {
    // compute the r[j]=R_{n+1,j}, 0<=j<=n,
    // gpr-notes (36),(37), p. 34.
@@ -289,7 +289,7 @@ estimateFunctional(const Functional& L)
 
 Real
 GPR::
-estimateLinearFunctional(const LinearFunctional& L)
+estimateLinearFunctional(LinearFunctional& L)
 {
    RealArray1D d=getCoefficients();
    // the sequence of values L(psi_k), k<=N.
@@ -304,7 +304,14 @@ estimateLinearFunctional(const LinearFunctional& L)
 
 
 
-
+Real
+GPR::
+monteCarloIntegral()
+{
+   Real I=0.0;
+   for(int j=0;j<=n;j++) I+=y[j];
+   return 2*I/(n+1);
+}
 
 
 //------------------INITIALIZATION--------------------------
@@ -614,20 +621,16 @@ setUp()
    // DATA
    RealFunction  f;
    cout << "Sample function f:" << endl
-        << "f0(t)=sin(2pi*t)...........[0]" << endl
-        << "f1(t)=5t*exp(-9t^2/2)......[1]" << endl
-        << "f2(t)=|t|..................[2]" << endl
-        << "f3(t)=|t|^{1/3}............[3]" << endl << endl
-        << "Enter f=[0,1,2,3]=";
+        << "f0(t)=sin(2t\pi)...............[0]" << endl
+        << "f1(t)=5t*exp(-9t^2/2)..........[1]" << endl
+        << "f2(t)=(1+t)cos(8t\pi)..........[2]" << endl
+        << "f3(t)=f1(t)+t^2sin(11t\pi).....[3]" << endl
+        << "f4(t)=1.6|t|sin(10t\pi)........[4]" << endl
+        << "f5(t)=t^2+t^3..................[5]" << endl << endl
+        << "Enter f=[0,1,2,3,4,5]=";
    int fnum; cin>>fnum;
    // *f is reference to pointer to sample function
-   switch(fnum){
-      case 1  : f=&f1; break;
-      case 2  : f=&f2; break;
-      case 3  : f=&f3; break;
-      default : f=&f0;
-   }
-
+   f=functionExample(fnum);
    // noise level
    sigma=0.0;
    cout << "Noisy data (0/1)? Noisy=";
@@ -638,10 +641,10 @@ setUp()
    }
 
    cout << endl << "Enter number N+1 of basis functions, N=";
-	cin>>N;
+   cin>>N;
    cout << "Enter number n+1 of data points, n=";
-	cin>>n;
-	t.resize(n+1);
+   cin>>n;
+   t.resize(n+1);
 
 	int random;
 	cout << "Data points random (random=1) or evenly spaced (random=0), random=";
@@ -718,14 +721,10 @@ setUp()
 		lout << "Function data noisy, "
 	        << "standard deviation of noise" << sigma << endl;
 	else
-		lout << "Function data exact." << endl;
+		lout << "Function data exact."
+         << "Function: f" << fnum
+         << endl;
 
-   switch(fnum){
-      case 1:  lout << "Function f(t)=5t*exp(-9t^2/2)" << endl; break;
-      case 2:  lout << "Function f(t)=|t|" << endl; break;
-      case 3:  lout << "Function f(t)=|t|^{1/3}" << endl; break;
-      default: lout << "Function f(t)=sin(2pi*t)" << endl;
-   }
 
    if(rType==GPR::GAUSSIAN){
 		lout << "Type of regression: GAUSSIAN" << endl;

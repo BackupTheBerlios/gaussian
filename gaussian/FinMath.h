@@ -28,7 +28,7 @@ spyqqqdia@yahoo.com
 
 
 GPR_BEGIN_NAMESPACE(Gaussian)
-GPR_BEGIN_NAMESPACE(FinMath)	
+GPR_BEGIN_NAMESPACE(FinMath)
 
 
 
@@ -199,9 +199,8 @@ Real blackImpliedAggregateCallVolatility(Real Q, Real k, Real y);
     
 
 
-
-
 GPR_END_NAMESPACE(FinMath)
 GPR_END_NAMESPACE(Gaussian)
+
 
 #endif

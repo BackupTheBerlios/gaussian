@@ -15,6 +15,10 @@
  *                                                                         *
  ***************************************************************************/
 
+#ifndef gpr_functionals_h
+#define gpr_functionals_h
+
+
 #include <cassert>
 #include "Array.h"
 
@@ -49,22 +53,22 @@ public:
    /** @param gp The Gaussian process regressor defining the Hilbert 
     *  space on which the functional is defined.
     */
-   Functional(GPR& gp);
+   Functional(GPR* gp) : gpr(gp) {  }
 
    /** The Gaussian process regressor defining the Hilbert space on
     *  which the functional is defined.
     */
-   GPR* getGPR() const { return gpr; }
+   GPR* getGPR() { return gpr; }
 
    /** The unconditional mean E(L), L=this, with respect to the measure
     *  underlying gpr.
     */
-   virtual Real mean() const =0;
+   virtual Real mean() =0;
 
    /** The covariance \f$Cov(E_j,L)\f$, where L=this, \f$E_j=E_{s_j}\f$
     *  computed in the probability underlying gpr.
     */
-   virtual Real covariance(int j) const =0;
+   virtual Real covariance(int j) =0;
 
 private:
 
@@ -81,14 +85,14 @@ class LinearFunctional : public Functional {
 
 public:
 
-   LinearFunctional(GPR& gp);
-   Real mean() const;
-   Real covariance(int j) const;
+   LinearFunctional(GPR* gp) : Functional(gp) {  }
+   Real mean();
+   Real covariance(int j);
 
    /** The sequence of values \f$L(\psi_k\f,\ k\leq N\f$, where the
     *  \f$\psi_k\f$ are the basis functions of gpr.
     */
-   virtual RealArray1D valuesOnBasisFunctions() const =0;
+   virtual RealArray1D valuesOnBasisFunctions() =0;
 };
 
 
@@ -100,10 +104,8 @@ class Integral : public LinearFunctional {
 
 public:
 
-   Integral(GPR& gp);
-   Real mean() const;
-   Real covariance(int j) const;
-   RealArray1D valuesOnBasisFunctions() const;
+   Integral(GPR* gp);
+   RealArray1D valuesOnBasisFunctions();
 };
 
 
@@ -117,10 +119,8 @@ class EvaluationFunctional : public LinearFunctional {
 public:
 
    /** Evaluation at the point s on the Hilbert space of gp. */
-   EvaluationFunctional(GPR& gp, Real s);
-   Real mean() const;
-   Real covariance(int j) const;
-   RealArray1D valuesOnBasisFunctions() const;
+   EvaluationFunctional(GPR* gp, Real s);   
+   RealArray1D valuesOnBasisFunctions();
 
 private:
 
@@ -131,3 +131,6 @@ private:
 
 
 GPR_END_NAMESPACE(Gaussian)
+
+#endif
+

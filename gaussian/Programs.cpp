@@ -117,7 +117,7 @@ interactiveRegression()
      cout << endl << endl << endl
           << "Do again? (0/1), again=";
      int again=0; cin>>again;
-     if(again==0) done=false;
+     if(again==0) done=true;
    }
 }
 
@@ -136,30 +136,33 @@ functionalEstimationTest()
    bool done=false;
    while(!done){
 
-     GPR& gpr=GPR::setUp();
-     gpr.conditioning();
+     GPR* gpr=&(GPR::setUp());
+     gpr->conditioning();
 
-     cout << endl << "Testing integral estimation (Bayesian Monte Carlo:";
+     cout << endl << "Integral estimation (Bayesian Monte Carlo):";
      Integral I(gpr);
-     Real I0=gpr.estimateFunctional(I);
+     Real I0=gpr->estimateFunctional(I);
      cout << endl << "Value as general functional = " << I0;
 
-     I0=gpr.estimateLinearFunctional(I);
+     I0=gpr->estimateLinearFunctional(I);
      cout << endl << "Value as linear functional = " << I0;
 
-     cout << endl << endl << "Testing point estimation at t=0.5:";
+     I0=gpr->monteCarloIntegral();
+     cout << endl << "Monte Carlo integral = " << I0;
+
+     cout << endl << endl << "Point estimation at t=0.5:";
      EvaluationFunctional L(gpr,0.5);
-     I0=gpr.estimateFunctional(L);
+     I0=gpr->estimateFunctional(L);
      cout << endl << "Value as general functional = " << I0;
 
-     I0=gpr.estimateLinearFunctional(L);
+     I0=gpr->estimateLinearFunctional(L);
      cout << endl << "Value as linear functional = " << I0;
      
 
      cout << endl << endl << endl
           << "Do again? (0/1), again=";
      int again=0; cin>>again;
-     if(again==0) done=false;
+     if(again==0) done=true;
    } // end while
 }
 

@@ -131,7 +131,7 @@ FourierBasis::
 integrals(int N) const
 {
    RealArray1D I(N+1);
-   I[0]=2.0;    // all other integrals are zero
+   I[0]=2.0*SQRT_TWO;    // all other integrals are zero
    return I;
 }
 

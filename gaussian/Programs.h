@@ -15,6 +15,10 @@
  *                                                                         *
  ***************************************************************************/
 
+#ifndef gpr_programs_h
+#define gpr_programs_h
+
+
 #include "TypedefsMacros.h"
  
 GPR_BEGIN_NAMESPACE(Gaussian)
@@ -61,3 +65,5 @@ void functionalEstimationTest();
 
 
 GPR_END_NAMESPACE(Gaussian)
+
+#endif

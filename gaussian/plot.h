@@ -18,8 +18,8 @@
 
 
  
-#ifndef gaussian_plot_h
-#define gaussian_plot_h
+#ifndef gpr_plot_h
+#define gpr_plot_h
 
 #include <plotter.h>
 #include <fstream>
