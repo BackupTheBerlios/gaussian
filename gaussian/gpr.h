@@ -19,10 +19,11 @@ using namespace Martingale;
 using std::string;
 
 
-
+class Functional;
+class LinearFunctional;
 
 /** Empirical and Gaussian process regression on [-1,+1] using expansion in
- *  basis functions. See gprs.ps.
+ *  basis functions. See gprs-1.2.ps ("gpr-notes").
  **/
 class GPR {
 	
@@ -69,8 +70,14 @@ public:
     */
    bool haveGaussian() const { return have_gaussian; }
 
-   /** Set the mean of the Gaussian prior P equal to mean.
-    *  Does nothing if regression type is empirical.
+   /** The mean of the Gaussian prior P encoded as the vector
+    *  \f$\mu_k=E{A_k]\f, k\leq N,\f$ of the unconditional 
+    *  expectations of the coefficient functionals.
+    */
+   const RealArray1D& getPriorMean() const { return mu; }
+
+   /** Set the mean \f$\mu_k=E[A_k]\f$ of the Gaussian prior P equal to 
+    *  mean. Does nothing if regression type is empirical.
     */
    void setPriorMean(const RealArray1D& mean);
 
@@ -196,10 +203,37 @@ public:
 
    /** The data are polluted with independent Gaussian noise (\f$\sigma=0.2\f$),
     *  the regressors computed and we then test which regressor best predicts the 
-    *  original data.
+    *  original data, see gpr-notes, section 5.2, p. 32.
+    *
     *  @returns index q of \$f_q\f$ with minimal error.
     */
    int polluteAndPredictCV();
+
+
+
+//------------------FUNCTIONAL ESTIMATION----------------------------
+
+
+    /** Estimate the value \f$E[\ths L\ths|\ths data\ths]\f$ as in
+     *  gpr-notes, section 6 (pp. 33-35). L has to be based on the
+     *  GPR <code>this</code> (L-constructor).
+     *
+     *  @returns \f$E[\ths L\ths|\ths data\ths]\f$.
+     */
+    Real estimateFunctional(const Functional& L);
+
+
+    /** Estimate the value \f$E[\ths L\ths|\ths data\ths]\f$ as in
+     *  gpr-notes, section 6, equation (40), p. 34. This assumes that the
+     *  coefficients \f$a_k=E[\ths A_k\ths|\ths data\ths]\f$ have already been
+     *  computed. L has to be based on the GPR <code>this</code> (L-constructor).
+     *
+     *  Current implementation uses the regressor \f$f_N\f$. This is only
+     *  useful with exact data.
+     *
+     *  @returns \f$E[\ths L\ths|\ths data\ths]\f$.
+     */
+    Real estimateLinearFunctional(const LinearFunctional& L);
 
    
 
@@ -259,14 +293,19 @@ private:
    RealMatrix psi;          // basis functions psi(k,j)=psi_k(s_j), 0<=k<=N, 0<=j<=n.
    UTRRealMatrix K;         // kernel matrix K(s_i,s_j), 0<=i,j<=n.
    LTRRealMatrix R;         // lower triangular Cholesky root of K.
-   RealArray1D mu;          // center of the Gaussian prior
+   RealArray1D mu;          // center of the Gaussian prior: mu[k]=E[A_k].
    RealArray1D a;           // Gaussian coefficients
    RealArray1D b;           // empirical coefficients
    RealArray1D ap;          // Gaussian coefficients based on the polluted data yp
    RealArray1D bp;          // empirical coefficients based on the polluted data yp
 
-   Real EA(int k, RealArray1D& w);       // coefficient a_k=E(A_k) of psi_k based on data w (=y,yp)
-   Real EC(int k, RealArray1D& w);       // empirical coefficient of psi_k  based on data w (=y,yp)
+   // Gaussian coefficient a_k=E(A_k) of psi_k based on data w (=y,yp),
+   // we need the data array yp for "pollute and predict" cross validation.
+   // see gpr-notes, section 5.2, p. 32.
+   Real EA(int k, RealArray1D& w);
+   // empirical coefficient of psi_k  based on data w (=y,yp):      
+   Real EC(int k, RealArray1D& w);
+         
    Real min_R_jj();
    Real max_R_jj();
    void diagonal_K_add(Real delta);
@@ -279,6 +318,7 @@ private:
    const RealArray1D& computePollutedCoefficients();
 
 }; // end GPR
+
 
 
 

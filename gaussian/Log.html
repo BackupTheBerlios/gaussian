@@ -91,5 +91,23 @@ Is the roughness penalty in the various bases too high?
 Note the poor performance on f3 in the Fourier basis.
 
 
+<h3>7-8-04</h3>
+
+Addition of methods <code>GPR::estimateFunctional </code>and <code>GPR::estimateLinearFunctional </code>
+for functional estimation. New files "Functionals.h,cpp", <code>BasisFunctions</code> aquire ability to compute their integrals over
+[-1,+1]. Intended purpose: testing Bayesian Monte Carlo.
+<p>
+Modifications have not yet been compiled. The <code>integrals</code> in <code>BasisFunctions</code>
+are not yet implemented. Next: implement these, then write some code to test Bayesian Monte Carlo both with the integrals as linear 
+functionals and general functionals.
+<p>
+<b>Bayesian Monte Carlo.</b> Note: if the basis functions psi_k are orthogonal in L^2(F,dt) and psi_0 is constant then all the integrals
+<code>Integral_F psi_k(t)dt,</code> with  k&gt 0, will be zero.
+In this case the coefficient of psi_0 is the estimate for the integral. This is the case for both the Fourier basis
+and the Legendre basis. In the implementation of the methods for functional estimation almost all terms of the relevant sums are zero.
+This precludes meaningful testing. Better: implement evaluation functionals and test the functional estimation methods on these.
+
+
+
 </body>
 </html>

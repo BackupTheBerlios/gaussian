@@ -62,6 +62,11 @@ public:
    /** Print an EPS graph of the first q basis functions. **/
    void print(int q);
 
+   /** The sequence of integrals
+    *  \f$I_k=\int_{-1}^{+1}\psi_k(t)dt,\ k\leq N.\f$
+    */
+   virtual const RealArray1D integrals(int N);
+
 };
 
 
@@ -75,6 +80,7 @@ public:
    string name() const { return "Legendre_basis"; }
    Real ymin(int q){ return -5.0; }
    Real ymax(int q){ return 5.0; }
+   const RealArray1D integrals(int N);
 };
 
 
@@ -88,4 +94,5 @@ public:
    string name() const { return "Fourier_basis"; }
    Real ymin(int q){ return -2.2; }
    Real ymax(int q){ return 2.2; }
+   const RealArray1D integrals(int N);
 };

@@ -41,6 +41,18 @@ print(int q)
    // add the rows to the plot
    for(int k=0;k<q;k++) plot.addFunction(psi[k],801);
 }
+
+
+
+const RealArray1D
+BasisFunctions::
+integrals(int N)
+{
+   cerr << "BasisFunctions: integrals not implemented current basis. Exiting.";
+   exit(EXIT_FAILURE);
+   RealArray1D I(N+1);
+   return I;
+}
       
       
       
@@ -74,6 +86,17 @@ roughnessPenalty(int q)
 }
 
 
+const RealArray1D
+LegendreBasis::
+integrals(int N)
+{
+   RealArray1D I(N+1);
+   I[0]=2.0;    // all other integrals are zero
+   return I;
+}
+
+
+
 
 //---------------- FOURIER BASIS ----------------------------  
 
@@ -98,6 +121,16 @@ FourierBasis::
 roughnessPenalty(int q)
 {
    return exp(-(q/5)*0.3);
+}
+
+
+const RealArray1D
+FourierBasis::
+integrals(int N)
+{
+   RealArray1D I(N+1);
+   I[0]=2.0;    // all other integrals are zero
+   return I;
 }
 
 

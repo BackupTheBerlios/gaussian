@@ -7,6 +7,7 @@
  ****************************************************************************/
 
 #include "gpr.h"
+#include "Functionals.h"
 #include <fstream>
 #include <cstdlib>
 #include <iomanip>
@@ -235,6 +236,77 @@ bp(M+1)
 
 
 
+//------------------FUNCTIONAL ESTIMATION--------------------------
+
+
+Real
+GPR::
+estimateFunctional(const Functional& L)
+{
+   // compute the r[j]=R_{n+1,j}, 0<=j<=n,
+   // gpr-notes (36),(37), p. 34.
+   RealArray1D r(n+1);
+   r[0]=L.covariance(0)/R(0,0);
+   for(int j=1;j<=n;j++){
+
+      Real sum=0.0;
+      for(int i=0;i<j;i++)sum+=r[i]*R(j,i);
+
+      r[j]=(L.covariance(j)-sum)/R(j,j);
+   }
+
+   // the means mu_E[j]=E^P(E_j) of the evaluation functionals E_j
+   // these are nonzero if P is not centered at zero
+   RealArray1D mu_E(n+1);
+   for(int j=0;j<=n;j++){
+
+      Real sum=0.0;
+      for(int k=0;k<=N;k++) sum+=mu[k]*psi(k,j);
+      mu_E[j]=sum;
+   }
+
+   // compute the Z_j, 0<=j<=n, gpr-notes (25), p. 11 with the
+   // (unconditional) means E(E_j) added on the right hand side.
+   RealArray1D Z(n+1);
+   Z[0]=(y[0]-mu_E[0])/R(0,0);
+   for(int j=1;j<=n;j++){
+
+      Real sum=0.0;
+      for(int k=0;k<j;k++) sum+=R(j,k)*Z[k];
+
+      Z[j]=(y[j]-mu_E[j]-sum)/R(j,j);
+   }
+
+   // compute EL=E[L|data], gpr-notes (25), p. 11 with the (unconditional) means
+   // added on the right hand side.
+   Real EL=L.mean();
+   for(int j=0;j<=n;j++) EL+=r[j]*Z[j];
+
+   return EL;
+}
+
+
+
+Real
+GPR::
+estimateFunctional(const LinearFunctional& L)
+{
+   const RealArray1D d=getCoefficients();
+   // the sequence of values L(psi_k), k<=N.
+   const RealArray1D l=L.valuesOnBasisFunctions();
+   // use regressor f_N to preserve equality with general
+   // functional estimation, gpr-notes, equation (40), p34.
+   // Recall: L(this,N)[k]=L(psi_k), k<=N.
+   Real EL=0.0;
+   for(int k=0;k<=N;k++) EL+=d[k]*l[k];
+   return EL;
+}
+
+
+
+
+
+
 //------------------INITIALIZATION--------------------------
 
 
@@ -347,7 +419,8 @@ EA(int k, RealArray1D& w)         // w = y,yp is the data array
     mu_E[j]=sum;
   }
 
-	// compute the Z_j, 0<=j<=n
+  // compute the Z_j, 0<=j<=n, gpr-notes (25), p. 11 with the
+  // (unconditional) means E(E_j) added on the right hand side.
 	RealArray1D Z(n+1);
 	Z[0]=(w[0]-mu_E[0])/R(0,0);
 	for(int j=1;j<=n;j++){
@@ -358,8 +431,8 @@ EA(int k, RealArray1D& w)         // w = y,yp is the data array
 		Z[j]=(w[j]-mu_E[j]-sum)/R(j,j);
 	}
 
-	// compute a_k=E(A_k), formula 20, p10, gprs.ps
-  // note A_k has (unconditional) mean mu[k]
+	// compute a_k=E[A_k|data], gpr-notes formula 25, p11 with the unconditional 
+  // means added on the right, note A_k has (unconditional) mean mu[k]
 	Real a_k=mu[k];
 	for(int j=0;j<=n;j++) a_k+=r[j]*Z[j];
 
@@ -770,4 +843,12 @@ computePollutedCoefficients()
    for(int k=0;k<=N;k++) ap[k]=EA(k,yp);
    return ap;
 }
+
+
+
+
+
+
+
+
    
