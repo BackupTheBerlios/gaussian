@@ -193,6 +193,15 @@ public:
     */
    int leaveOneOutCV();
 
+   /** The data are polluted with independent Gaussian noise (\f$\sigma=0.2\f$),
+    *  the regressors computed and we then test which regressor best predicts the 
+    *  original data.
+    *  @returns index q of \$f_q\f$ with minimal error.
+    */
+   int polluteAndPredictCV();
+
+   
+
 
 //------------------TESTS--------------------------------------------
 

@@ -43,6 +43,15 @@ Fix up <code>Plot::addFunction, addPoints</code> so as to include a legend.
 Hand in name as string parameter.
 
 
+<h3>6-25-04</h3>
 
+New cross validation <code>GPR::polluteAndPredictCV()</code> implemented. Data are polluted with independent Gaussian noise
+of standard deviation sigma and the regressors computed. We then choose the regressor which best predicts the original data.
+No recomputation of the Cholesky root necessary, only the coefficients have to be recomputed.
+
+The standard deviation sigma of the pollution should be at least as large as the standard deviation of the original noise in the data.
+In the case of exact data reduce the bias against higher order expansions (the factor which enforces exponential dropoff of the errors).
+
+This works better than leave one out cross validation and leaves the complexity at O(n^3).
 </body>
 </html>

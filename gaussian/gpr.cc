@@ -391,7 +391,8 @@ expansionData(int q)
    fout.close();
    cout << endl << endl << endl
         << "Coefficients: " << getCoefficients() << endl;
-   leaveOneOutCV();
+   //leaveOneOutCV();
+   polluteAndPredictCV();
 }
 
 			
@@ -697,4 +698,37 @@ cout << endl << endl << "Optimal q: " << m;
 }
     
 
+int
+GPR::
+polluteAndPredictCV()
+{
+    RealArray1D error(N+1);     
+    RealArray1D w(n+1);
+    for(Real sigma=0.2;sigma<0.6;sigma+=0.1){
 
+       // pollute data with Gaussian noise of standard deviation sigma
+       for(int j=0;j<=n;j++) w[j]=y[j]+sigma*Random::sTN();
+       GPR vGpr(N,s,w,basis,regrType);
+       const RealArray1D& a=vGpr.getCoefficients();
+       const RealMatrix&  psi=vGpr.get_psi();
+       // compute the prediction error at s_k for all the f_q
+       for(int k=0;k<=n;k++){     // error at s_k
+
+          Real f_q=0;
+          for(int q=0;q<=N;q++){     // error of f_q
+
+              f_q+=a[q]*psi(q,k);     // f_q(s_j)
+              error[q]+=(y[k]-f_q)*(y[k]-f_q);
+          }       
+       } // error vector at noise level sigma is computed
+    } // end sigma
+
+    int m=0; Real err=100000000;
+    // enforce geometric decay of error as degree q of expansion increases
+    // and discard f_N since this has inexplicably low errors
+    for(int q=0;q<N;q++) if(error[q]<0.92*err){ err=error[q]; m=q; }
+
+cout << endl << endl << "Pollute and predict error vector: " << error;
+cout << endl << endl << "Optimal q: " << m;
+    return m;
+}
