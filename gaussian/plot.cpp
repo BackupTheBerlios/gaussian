@@ -14,7 +14,7 @@ using std::max;
 
 const char*
 PSPlot::
-colors[10]={ "brown", "black", "red", "green", "blue", "orange", 
+colors[10]={ "brown", "green", "blue", "orange", "red", "black",
               "yellow", "magenta", "cyan", "darkblue" };
 
 
@@ -101,13 +101,7 @@ void
 PSPlot::
 addPoints(Real* y, Real* t, int n)
 {
-   colorname("red");
-   filltype(1);    
-   Real r=(xmax-xmin)/800;
-   // to get squares compensate for the horizontal squeeze by 1+GR
-   for(int j=0;j<n;j++) fbox(t[j]-r,y[j]-2*r*(1+GR),t[j]+r,y[j]+2*r*(1+GR));
-   colorname("white");
-   filltype(0);       
+   for(int j=0;j<n;j++) drawMarker(t[j],y[j]);
 }
 
 
@@ -124,6 +118,42 @@ addPoints(const RealArray1D& y, const RealArray1D& t)
 }
 
 
+void
+PSPlot::
+drawLabel(Real x, Real y, string s)
+{
+    Real dx=xmax-xmin,
+         dy=ymax-ymin;
+    ffontsize(0.07);
+    pencolorname("black");
+    fscale(1.0,(1.0+GR)*dy/dx);
+    fmove(x,y*dx/((1.0+GR)*dy));
+    // undo horizontal distortion
+    label(s.c_str());
+    fscale(1.0,dx/((1.0+GR)*dy));
+}
+
+
+void
+PSPlot::
+drawMarker(Real x, Real y)
+{
+   colorname("red");
+   filltype(1);
+   // compensate for the squeeze in dy by 1+GR   
+   Real dx=(xmax-xmin)/400, dy=dx*(1+GR);
+
+   // left corner of diamond
+   fmove(x-dx,y);
+   flinerel(0,0,dx,dy);
+   flinerel(0,0,dx,-dy);
+   flinerel(0,0,-dx,-dy);
+   flinerel(0,0,-dx,dy);
+   endpath();
+
+   colorname("white");
+   filltype(0);
+}   
 
 
 

@@ -704,7 +704,7 @@ polluteAndPredictCV()
 {
     RealArray1D error(N+1);     
     RealArray1D w(n+1);
-    for(Real sigma=0.2;sigma<0.6;sigma+=0.1){
+    for(Real sigma=0.2;sigma<0.3;sigma+=0.1){
 
        // pollute data with Gaussian noise of standard deviation sigma
        for(int j=0;j<=n;j++) w[j]=y[j]+sigma*Random::sTN();
@@ -726,9 +726,8 @@ polluteAndPredictCV()
     int m=0; Real err=100000000;
     // enforce geometric decay of error as degree q of expansion increases
     // and discard f_N since this has inexplicably low errors
-    for(int q=0;q<N;q++) if(error[q]<0.92*err){ err=error[q]; m=q; }
+    for(int q=0;q<N;q++)
+    if(error[q]<(basis->roughnessPenalty(q))*err){ err=error[q]; m=q; }
 
-cout << endl << endl << "Pollute and predict error vector: " << error;
-cout << endl << endl << "Optimal q: " << m;
     return m;
 }

@@ -28,6 +28,7 @@ using std::setprecision;
 using std::sin;
 using std::exp;
 using std::log;
+using std::abs;
 using namespace Martingale;
 
 
@@ -40,20 +41,20 @@ Real
 f1(Real t){ return 5*t*exp(-9*t*t/2); }
 
 Real
-f2(Real t){ return (t>0)? t:-t; }
+f2(Real t){ return (1+t)*cos(7*PI*t); }
 
 Real
-f3(Real t){
-   if(t==0) return 0.0;
-   return (t>0)? exp(log(t)/3):exp(log(-t)/3);
-}
+f3(Real t){ return 5*t*exp(-9*t*t/2)+t*t*sin(11*PI*t); }
+
+Real
+f4(Real t){ return 1.6*abs(t)*sin(11*PI*t); }
 
 
 RealFunction
 functionExample(int j)
 {
    assert((0<=j)&&(j<=4));
-   RealFunction f[4]={&f0,&f1,&f2,&f3};
+   RealFunction f[5]={&f0,&f1,&f2,&f3,&f4};
    return f[j];
 }
 

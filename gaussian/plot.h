@@ -88,6 +88,12 @@ public:
     **/
    void addPoints(const RealArray1D& y, const RealArray1D& t);
 
+   /** Draw text label at (x,y) */
+   void drawLabel(Real x, Real y, string s);
+
+   /** Draws diamond shaped marker centered at (x,y). */
+   void drawMarker(Real x, Real y);
+
 }; 
 
 

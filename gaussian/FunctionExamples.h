@@ -28,17 +28,21 @@ using namespace Martingale;
  **/
 Real f0(Real t);
 
-/** \f$f(t)=20t^{1/3}exp(-6t)\f$.
+/** \f$f(t)=5t*exp(-9t^2/2)\f$.
  **/
 Real f1(Real t);
 
-/** \f$f(t)=|t|\f$.
+/** \f$f(t)=(1+t)cos(8\pi t)\f$.
  **/
 Real f2(Real t);
 
 /** \f$f(t)=|t|^{1/3}\f$.
  **/
 Real f3(Real t);
+
+/** \f$f(t)=1.6|t|sin(10\pi t)\f$.
+ **/
+Real f4(Real t);
 
 /** The j-th function exmple. */
 RealFunction functionExample(int j);

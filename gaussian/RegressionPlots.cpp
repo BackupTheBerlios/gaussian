@@ -61,6 +61,8 @@ regressionPlots(int j, bool noisy)
 {
     int n=gpr_.get_n();
     int N=gpr_.get_N();
+    const RealArray1D& y=gpr_.getFunctionData();
+    const RealArray1D& s=gpr_.get_s();
     
     RealFunction f=functionExample(j);   
     gpr_.setFunction(f);
@@ -71,7 +73,6 @@ regressionPlots(int j, bool noisy)
     // for string conversion
     Int_t j_t(j);
     Int_t n_t(n);
-    Int_t N_t(N);
     // allocate directories
     // fj/Ecact
     string fcn="f"+j_t.str();
@@ -92,15 +93,16 @@ regressionPlots(int j, bool noisy)
 
     // expansions
     RealArray1D f_true(801);
-    RealArray1D f_5(801);
-    RealArray1D f_9(801);
-    RealArray1D f_17(801);
+    RealArray1D f_q(801);
 
     // EMPIRICAL EXPANSIONS
     gpr_.setRegressionType(GPR::EMPIRICAL);
+    int q=gpr_.polluteAndPredictCV();
+    Int_t q_t(q);
+    string q_label="q = "+q_t.str();
     // plotter
-    string file_e=fcn+"-"+N_t.str()+"-"+n_t.str();
-    if(noisy) file_e+="-0.2"; file_e+=+"-emp.eps";
+    string file_e=fcn+"-"+n_t.str();
+    if(noisy) file_e+="-0.2"; file_e+="-emp.eps";
     ofstream fout_e(file_e.c_str());
     PSPlot plot_e(fout_e,-1.0,1.0,-2.0,2.0);
 
@@ -109,23 +111,21 @@ regressionPlots(int j, bool noisy)
 
        Real t=-1.0+j*1.0/400;
        f_true[j]=f(t);
-       f_5[j]=gpr_.expansion(t,5);
-       f_9[j]=gpr_.expansion(t,9);
-       f_17[j]=gpr_.expansion(t,17);
+       f_q[j]=gpr_.expansion(t,q);
     }
-    plot_e.addFunction(f_true);
-    plot_e.addFunction(f_5);
-    plot_e.addFunction(f_9);
-    plot_e.addFunction(f_17);
-cerr << endl << endl << endl << "f: " << f_true << endl << endl;
-cerr << endl << endl << endl << "f_5: " << f_5 << endl << endl;
-cerr << endl << endl << endl << "f_9: " << f_9 << endl << endl;
+    plot_e.addFunction(f_true);        // green
+    plot_e.addFunction(f_q);           // blue
+    plot_e.addPoints(y,s);
+    plot_e.drawLabel(-0.9,-1.9,q_label);
 
     // GAUSSIAN EXPANSIONS
     gpr_.setRegressionType(GPR::GAUSSIAN);
+    q=gpr_.polluteAndPredictCV();
+    Int_t qt(q);
+    q_label="q = "+qt.str();
     // plotter
-    string file_g=fcn+"-"+N_t.str()+"-"+n_t.str();
-    if(noisy) file_g+="-0.2"; file_g+=+"-gsn.eps";
+    string file_g=fcn+"-"+n_t.str();
+    if(noisy) file_g+="-0.2"; file_g+="-gsn.eps";
     ofstream fout_g(file_g.c_str());
     PSPlot plot_g(fout_g,-1.0,1.0,-2.0,2.0);
 
@@ -134,14 +134,12 @@ cerr << endl << endl << endl << "f_9: " << f_9 << endl << endl;
 
        Real t=-1.0+j*1.0/400;
        f_true[j]=f(t);
-       f_5[j]=gpr_.expansion(t,5);
-       f_9[j]=gpr_.expansion(t,9);
-       f_17[j]=gpr_.expansion(t,17);
+       f_q[j]=gpr_.expansion(t,q);
     }
-    plot_g.addFunction(f_true);
-    plot_g.addFunction(f_5);
-    plot_g.addFunction(f_9);
-    plot_g.addFunction(f_17);
+    plot_g.addFunction(f_true);    
+    plot_g.addFunction(f_q);
+    plot_g.addPoints(y,s);
+    plot_g.drawLabel(-0.9,-1.9,q_label);
 
     // move the files into appropriate directories
     if(noisy){
@@ -188,10 +186,10 @@ regressionPlots()
    string cmd="mkdir expansions/"+basis;
    system(cmd.c_str());
 
-   for(int j=0;j<4;j++)
-   for(int n=11;n<32;n+=10){
+   for(int j=0;j<5;j++)
+   for(int n=10;n<91;n+=10){
 
-      int N=int(1.6*n);
+      int N=n; // number of basis functions
       GPR gpr(N,n,functionExample(j),bFcns,random); // clean data
       RegressionPlots regrPlot(gpr);
       bool noisy=false;

@@ -53,5 +53,29 @@ The standard deviation sigma of the pollution should be at least as large as the
 In the case of exact data reduce the bias against higher order expansions (the factor which enforces exponential dropoff of the errors).
 
 This works better than leave one out cross validation and leaves the complexity at O(n^3).
+
+
+<h3>6-26-04</h3>
+
+Several new methods for the class <code>PSPlot</code>. <br>
+<code>BasisFunctions:</code> Each basis now computes its own roughness penalty factors to be used in
+cross  validation .
+<p>
+<a name="todo-6-26"></a>
+<b>To do:</b><br>
+Class <code>GPR:</code> add a field <code>sigma</code> for the true standard deviation of the
+noise. We need this for cross validation. The noise added in <code>GPR::polluteAndPredictCV()</code>
+works best if the noise used for pollution of the data has the same or slightly higher standard deviation
+than the noise in the data. Adjust the constructors accordingly. Reduce the roughness penalty in
+<code>GPR::polluteAndPredictCV()</code> in case of exact data.
+<p>
+<code>GPR::polluteAndPredictCV()</code> is also not optimized yet as the kernel matrix and
+its Cholesky root are needlessly recomputed. Introduce new 3 fields in <code>GPR</code> for the data and
+coefficient vectors after artificial data pollution. Hand these as parameters to the coefficient routines
+<code>GPR::EC(),EA()</code>. Then it is unnecessary to allocate a new <code>GPR</code> object for
+<code>GPR::polluteAndPredictCV()</code> cross validation.
+<p>
+Do some experiments with relative noise instead of absolute noise in the data.
+
 </body>
 </html>

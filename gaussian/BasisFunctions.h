@@ -35,6 +35,12 @@ public:
     **/
    virtual RealArray1D values(Real x, int m)=0;
 
+   /** Multiplier \f$\rho\in(0,1]\f$ used in {@link GPR::polluteAndPredictCV()}.
+    *  We move from \f$f_{q-1}\f$ to \f$f_q\f$ only if error drops of by factor
+    *  \f$\rho\f$.
+    **/
+   virtual Real roughnessPenalty(int q){ return 1.0; }
+   
    /** Designation of basis.
     **/
    virtual string name() const =0;
@@ -65,6 +71,7 @@ class LegendreBasis : public BasisFunctions {
 public:
 
    RealArray1D values(Real x, int m);
+   Real roughnessPenalty(int q);
    string name() const { return "Legendre_basis"; }
    Real ymin(int q){ return -5.0; }
    Real ymax(int q){ return 5.0; }
@@ -77,6 +84,7 @@ class FourierBasis : public BasisFunctions {
 public:
 
    RealArray1D values(Real x, int m);
+   Real roughnessPenalty(int q);
    string name() const { return "Fourier_basis"; }
    Real ymin(int q){ return -2.2; }
    Real ymax(int q){ return 2.2; }

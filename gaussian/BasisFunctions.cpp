@@ -44,7 +44,7 @@ print(int q)
       
       
       
-      
+//---------------- LEGENDRE BASIS ----------------------------      
 
 
 RealArray1D
@@ -66,6 +66,18 @@ values(Real x, int m)
 }
 
 
+Real
+LegendreBasis::
+roughnessPenalty(int q)
+{
+   return exp(-(q/5)*0.3);
+}
+
+
+
+//---------------- FOURIER BASIS ----------------------------  
+
+
 RealArray1D
 FourierBasis::
 values(Real x, int m)
@@ -78,6 +90,14 @@ values(Real x, int m)
    for(int k=1;k<=m;k+=2) P[k]=SQRT_TWO*sin((1+k/2)*PI*x);
    
 	return P;
+}
+
+
+Real
+FourierBasis::
+roughnessPenalty(int q)
+{
+   return exp(-(q/5)*0.3);
 }
 
 

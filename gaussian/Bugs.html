@@ -75,6 +75,17 @@ Hand in name as string parameter.
 
 Bug in Fourier basis identified and eliminated.
 
+<h3>6-26-04</h3>
+
+<code>GPR::leaveOneOutCV()</code> still not optimized. May not be worth it since it is hopeless anyway.
+Focus on <code>GPR::polluteAndPredictCV()</code> which is also not optimized yet. See
+<a href="Log.html#todo-6-26">to do</a>.
+<p>
+<code>regressionPlots()</code> dies at the function <code>f2</code> when using the Legendre basis.
+It does no always die at the same spot.
+
+
+
 
 
 </body>
