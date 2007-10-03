@@ -1,28 +1,12 @@
-/***************************************************************************
- *   Copyright (C) 2007 by mjhmeyer   *
- *   mjhmeyer@yahoo.com   *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
 
-#include "CubicSpline.h"
-#include "tridiagonalmatrix.h"
+
+#include "CubicSpline.hpp"
+#include "TridiagonalMatrix.hpp"
 #include <cmath>
 
+
 namespace spline {
+	
 
 CubicSpline::
 CubicSpline(int n_Data, Vector t, Vector w, double yp_Left, double yp_Right):
@@ -35,28 +19,29 @@ ypRight_(yp_Right),
 g_(n_Data),
 sp_(n_Data-1)
 {
-	int l=nData()-1;
-	Vector D(nData());
-	Vector diag(nData());
+		 int l=nData()-1;
+		 Vector D(nData());
+		 Vector diag(nData());
 
-	h(0) = x(1)-x(0);
-	D[0] = (y(1)-y(0))/h(0)-ypLeft();
-	diag[0] = 2*h(0);
+		 h(0) = x(1)-x(0);
+		 D[0] = (y(1)-y(0))/h(0)-ypLeft();
+		 diag[0] = 2*h(0);
 
-	for(int i=1;i<l;i++){
+		 for(int i=1;i<l;i++){
 
-		h(i) = x(i+1)-x(i);
-		D[i] = (y(i+1)-y(i))/h(i) - (y(i)-y(i-1))/h(i-1);
-        diag[i] = 2*(h(i)+h(i-1));
-	}
-    D[l] = ypRight()-(y(l)-y(l-1))/h(l-1);
-	diag[l] = 2*h(l-1);
+		 		 h(i) = x(i+1)-x(i);
+		 		 D[i] = (y(i+1)-y(i))/h(i) - (y(i)-y(i-1))/h(i-1);
+                 diag[i] = 2*(h(i)+h(i-1));
+		 }
+         D[l] = ypRight()-(y(l)-y(l-1))/h(l-1);
+		 diag[l] = 2*h(l-1);
 
-	TridiagonalMatrix A(nData(),diag,h_);
-	g_=A.solve_AXeqY(D);
+		 TridiagonalMatrix A(nData(),diag,h_);
+		 A*=1/6.0;
+		 g_=A.solve_AXeqY(D);
 
-	for(int i=0;i<l;i++) 
-		sp(i) = (y(i+1)-y(i))/h(i) + h(i)*(g(i)+2*g(i+1))/6;
+		 for(int i=0;i<l;i++) 
+		 	sp(i) = (y(i+1)-y(i))/h(i) + h(i)*(g(i)+2*g(i+1))/6;
 }
 
 
@@ -72,16 +57,16 @@ CubicSpline::
 find(double t)
 {
     // binary search
-	double eps = 1E-12;
 	int left=0, right=nData()-1;
 	// maintain right>left and x\in(x(left),x(right)]
 	while(right-left>1){
 
-		int m = left + (right-left)/2;
-		if(t>x(m)+eps) left=m; else right=m;
+		 int m = left + (right-left)/2;
+		 if(t>x(m)) left=m; else right=m;
 	}
     return left;
 }
+
 
 double
 CubicSpline::
