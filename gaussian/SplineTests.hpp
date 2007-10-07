@@ -26,6 +26,7 @@ double nextUniform(double a, double b);
 void testRand(double a, double b);
 
 void testSpline();
+void testQPInterpolator();
 
 
 } // end namespace spline
