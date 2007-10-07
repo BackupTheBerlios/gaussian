@@ -7,7 +7,7 @@
  ****************************************************************************/
  
 
-#include "DoubleMatrix.h"
+#include "DoubleMatrix.hpp"
 #include <cmath>
 
 
@@ -16,6 +16,7 @@ SymmetricMatrix(int n)
 :
 dim_(n)
 {
+	// we store only the lower half
 	A.resize(n);
 	for(int i=0;i<n;i++) A[i].resize(i+1);	
 }
@@ -25,7 +26,7 @@ double&
 SymmetricMatrix::
 operator()(int i, int j)
 {
-	if(i<=j) return A[i][j];
+	if(j<=i) return A[i][j];
 	return A[j][i];	
 }
 
@@ -64,7 +65,8 @@ rightMult(Vector X)
     for(int i=0;i<dim();i++){
 
 		double sum = 0.0;
-		for(int j=0;j<dim();j++) sum += A[i][j]*X[j];
+		for(int j=0;j<=i;j++) sum += A[i][j]*X[j];
+		for(int j=i+1;j<dim();j++) sum += A[j][i]*X[j];
 		Y[i] = sum;
 	}		
 	return Y;	
@@ -82,6 +84,28 @@ solve_AXeqY(Vector Y)
 
 
 
+
+LowerTriangularMatrix::
+LowerTriangularMatrix(int n)
+:
+dim_(n)
+{
+	Q.resize(n);
+	for(int i=0;i<n;i++) Q[i].resize(i+1);	
+}	
+
+
+
+double& 
+LowerTriangularMatrix::
+operator()(int i, int j)
+{
+	if(j<=i) return Q[i][j];
+	return Q[j][i];	
+}
+
+
+
 Vector 
 LowerTriangularMatrix::
 rightMult(Vector X)
@@ -95,6 +119,24 @@ rightMult(Vector X)
 	}		
 	return Y;	
 }
+
+
+
+Vector 
+LowerTriangularMatrix::
+transposeRightMult(Vector X)
+{
+	Vector Y(dim());
+    for(int i=0;i<dim();i++){
+
+		double sum = 0.0;
+		for(int j=i;j<dim();j++) sum += Q[j][i]*X[j];
+		Y[i] = sum;
+	}		
+	return Y;	
+}
+
+
 
 
 SymmetricMatrix 
@@ -137,7 +179,7 @@ solve_QtXeqY(Vector Y)
 	for(int i=dim()-1;i>=0;i--){
 		
 		double sum=0.0;
-		for(int j=i+1;j<dim();j++) sum += Q[i][j]*X[j];
+		for(int j=i+1;j<dim();j++) sum += Q[j][i]*X[j];
 		X[i] = (Y[i]-sum)/Q[i][i];			
 	}
 	return X;

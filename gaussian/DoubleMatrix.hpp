@@ -10,7 +10,7 @@
 #define ____Matrix_H_1949532____
 
 
-/*! @file Matrix.h
+/*! @file DoubleMatrix.hpp
  * Symmetric matrices of type double, Cholesky factorization and 
  * solution of systems of equations.
  */
@@ -25,7 +25,7 @@ class SymmetricMatrix {
 public:
  
 SymmetricMatrix(int n);
-~SymmetricMatrix();
+~SymmetricMatrix(){};
  
 int dim(){ return dim_; }
 LowerTriangularMatrix choleskyRoot();
@@ -38,8 +38,7 @@ private:
 
 int dim_;
 Matrix A;
- 
-  
+
 };
 
 
@@ -50,10 +49,13 @@ class LowerTriangularMatrix {
 public:
  
 LowerTriangularMatrix(int n);
-
+~LowerTriangularMatrix(){}
  
 int dim(){ return dim_; }
+/* QX where Q=this. */
 Vector rightMult(Vector X);
+/* Q'X where Q=this. */
+Vector transposeRightMult(Vector X);
 /* QQ' where Q=this. */
 SymmetricMatrix qqt();
 /* Solves QX=Y, where Q=this, and returns the solution. */
