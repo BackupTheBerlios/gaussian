@@ -5,6 +5,7 @@
 #include "TridiagonalMatrix.hpp"
 #include "DoubleMatrix.hpp"
 #include "CubicSpline.hpp"
+#include "QuadraticPolynomialInterpolator.hpp"
 #include "RNG.hpp"
 #include <math.h>
 
@@ -327,6 +328,39 @@ testSpline()
 		 //fout_diff2.close();
 }
 
+
+
+
+void
+testQPInterpolator()
+{
+		 int nData = 5;
+		 
+		 Vector X(nData);
+		 Vector Y(nData);
+		 
+		 X[0]=-2; Y[0]=0.0;
+         X[1]=-1.5; Y[1]=1.8;		 
+		 X[2]=0.0; Y[2]=2.2;
+         X[3]=1.2; Y[3]=2.5;		 
+		 X[4]=2.0; Y[4]=2.7;
+
+
+		 QuadraticPolynomialInterpolator Q(nData,X,Y);
+		 ofstream fout("QP.txt");
+	
+         // print: triple the number of data points.
+		 // every third point is a knot.
+		 double t=-2.0;
+		 double dt=0.01;
+		 
+		 while(t<2.1){
+
+			 fout << t << "; " << Q(t) << endl;
+		 	 t+=dt;
+		 }
+		 fout.close();
+}
 
 
 
